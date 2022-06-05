@@ -1,0 +1,20 @@
+{
+  "name": "html-2-fragments-collection",
+  "version": "1.0.4",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "liferay-design": "./index.js"
+  },
+  "author": "Mahmoud Hussein Tayem",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.3.0",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^10.1.0",
+    "node-html-parser": "^5.3.3"
+  }
+}
