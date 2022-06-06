@@ -10,8 +10,10 @@ program
     .description('Generate fragments collection out static html page')
     .option('-c, --collectionName [value]', 'Specify the collection name')
     .option('-f, --file [value]', 'Specify the html file path')
+    .option('-s, --groupResources [value]', 'Specify the html file path')
     .action(function (design, args) {
-        html2fragments.start(design.collectionName,design.file);
+
+        html2fragments.start(design.collectionName,design.file,design.groupResources.toLowerCase()==="yes");
     });
 program.parse(process.argv);
 

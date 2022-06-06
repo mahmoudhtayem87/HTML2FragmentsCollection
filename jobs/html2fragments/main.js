@@ -9,6 +9,7 @@ const componentSelectorAtt = "liferay-component-type";
 const componentNameAtt = "liferay-component-name";
 var _componentId = 0 ;
 
+var groupResources = false;
 var componentsList = [];
 var collectionFolderPath="";
 var projectFolder = "";
@@ -20,6 +21,12 @@ var resources_css_list = [];
 
 function elementParser(el,componentId)
 {
+    //data-lfr-background-image-id="unique-id"
+    if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image")!=-1)
+    {
+            var currentComponent = componentsList.filter(com=> com.Id === componentId)[0];
+            el.setAttribute("data-lfr-background-image-id",`bgImage_${currentComponent.randomIdCode++}`);
+    }
     if (el.querySelectorAll("*").length > 0) {
         el.querySelectorAll('*').forEach(sub_element => {
             if (sub_element.nodeType === 1 && sub_element.parentNode === el)
@@ -118,7 +125,8 @@ function processFragmentsFolders()
         componentsList.forEach(component=>{
             var componentfolder = `${collectionFolderPath}/${component.name.toLowerCase().replace(" ","-")}`;
             fse.ensureDir(componentfolder, async err => {
-                await helpers.saveFile(`${componentfolder}/index.html`,prepareResourcesInjectionHTML()+ component.html);
+                var resources = groupResources?"":prepareResourcesInjectionHTML();
+                await helpers.saveFile(`${componentfolder}/index.html`,resources+ component.html);
                 await helpers.saveFile(`${componentfolder}/configuration.json`, getComponentConfigurations(component));
                 await helpers.saveFile(`${componentfolder}/fragment.json`, getFragmentDescriptionFile(component));
                 await helpers.saveFile(`${componentfolder}/main.js`, "");
@@ -251,9 +259,10 @@ function getFixedCSS(filePath)
     });
     return csstree.generate(ast);
 }
-function start(_collectionName,htmlFilePath)
+function start(_collectionName,htmlFilePath,_groupStyles)
 {
     htmlFile = htmlFilePath;
+    groupResources = _groupStyles;
     collectionName=_collectionName;
     var currentDate = helpers.getDate();
     collectionFolderPath = `./auto-generated-fragments/${currentDate}/${collectionName.replace(" ","-")}/src/${collectionName.replace(" ","-")}`;
@@ -266,7 +275,10 @@ function start(_collectionName,htmlFilePath)
         await createCollectionPackageJSON();
         await createLiferayDeployFragmentsJSON();
         await createLiferayNPMBundlerConfigJS();
-
+        if (groupResources)
+        {
+            componentsList.push({name:"LayoutResourcesComponent",randomIdCode:0,Id:-1,configuration:[],html:prepareResourcesInjectionHTML()});
+        }
         processComponents();
         await processFragmentsFolders();
         await compressCollection();
