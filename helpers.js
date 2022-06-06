@@ -1,6 +1,21 @@
 const {createReadStream, createWriteStream} = require("fs");
 const fs = require('fs-extra');
 const {pathExistsSync} = require("fs-extra");
+const fse = require('fs-extra');
+const path = require('path');
+
+function buildPathTree(filePath) {
+    var pathObj = path.parse(filePath);
+    var pathDir = pathObj.dir.substring(1, pathObj.dir.length);
+    var pathArray = pathDir.split('/');
+    return pathArray;
+}
+
+function readFileContent(filePath) {
+    const buffer = fs.readFileSync(filePath);
+    var fileContent = buffer.toString();
+    return fileContent;
+}
 
 function getDate() {
     var date_ob = new Date();
@@ -24,9 +39,46 @@ async function saveFile(filePath, fileData) {
     });
     return prom;
 }
+function getFileName(fileFullPath)
+{
+    var pathObj = path.parse(fileFullPath);
+    return pathObj.base;
+}
+function getFileExtension(fileFullPath)
+{
+    var pathObj = path.parse(fileFullPath);
+    return pathObj.ext;
+}
+function relativePathToFullPath(filePath, relativePath) {
+    var _dirTree = buildPathTree(filePath);
+    var dirTree = JSON.parse(JSON.stringify(_dirTree));
+    var path = `/${dirTree.join('/')}/${relativePath.replace('./', "")}`;
+    if (relativePath.startsWith('./')) {
+        path = `/${dirTree.join('/')}/${relativePath.replace('./', "")}`;
+    } else if (relativePath.startsWith('../')) {
+        var numberOfPops = (relativePath.match(new RegExp("../", "g")) || []).length;
+        for (var index = 0; index < numberOfPops; index++) {
+            dirTree.pop();
+        }
+        path = `/${dirTree.join('/')}/${relativePath.replaceAll('../', "")}`;
+    }else if(relativePath.startsWith('/'))
+    {
+        path = `/${dirTree.join('/')}${relativePath}`;
+    }else
+    {
+        path = `/${dirTree.join('/')}/${relativePath}`;
+    }
+    return path;
+}
+
 
 
 module.exports = {
     getDate,
-    saveFile
+    saveFile,
+    readFileContent,
+    buildPathTree,
+    getFileName,
+    relativePathToFullPath,
+    getFileExtension
 }

@@ -1,6 +1,6 @@
 {
   "name": "html-2-fragments-collection",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^9.3.0",
+    "compressing": "^1.5.1",
+    "css-tree": "^2.1.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "node-html-parser": "^5.3.3"

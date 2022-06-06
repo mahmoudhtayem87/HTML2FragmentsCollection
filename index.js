@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-
 const html2fragments = require('./jobs/html2fragments/main.js');
 const program = require('commander');
 
@@ -15,3 +14,5 @@ program
         html2fragments.start(design.collectionName,design.file);
     });
 program.parse(process.argv);
+
+
