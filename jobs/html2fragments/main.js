@@ -332,7 +332,6 @@ async function SaveJSScripts() {
 }
 
 function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
-    console.log(htmlFilePath);
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
     collectionName = _collectionName;
@@ -372,7 +371,6 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
 
     });
 }
-
 
 module.exports = {
     start
