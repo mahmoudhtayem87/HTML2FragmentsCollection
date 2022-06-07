@@ -1,3 +1,4 @@
+const inquirer = require('inquirer');
 const compressing = require('compressing');
 var HTMLParser = require('node-html-parser');
 const helpers = require('../../helpers');
@@ -368,6 +369,7 @@ function start(_collectionName,htmlFilePath,_groupStyles,_includeJSResources)
 
     });
 }
+
 
 module.exports = {
     start

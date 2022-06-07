@@ -2,20 +2,45 @@
 
 const html2fragments = require('./jobs/html2fragments/main.js');
 const program = require('commander');
+const inquirer = require("inquirer");
 
-
+function askMe()
+{
+    inquirer
+        .prompt([
+            {
+                name: 'file',
+                message: 'Please specify the html file path "full path is required"?',
+                default: ''
+            },
+            {
+                name: 'collectionName',
+                message: 'Please specify the fragments collection name?',
+                default: 'HTML2FragmentsCollection'
+            },
+            {
+                type: 'rawlist',
+                name: 'groupResources',
+                message: 'Would you like to group all styles referencing in a single fragment?',
+                choices: ['Yes', 'No'],
+            },{
+                type: 'rawlist',
+                name: 'includeJSResources',
+                message: 'Would you like JavaScript resources?',
+                choices: ['Yes', 'No'],
+            }
+        ])
+        .then(answers => {
+            html2fragments.start(answers.collectionName,answers.file,answers.groupResources.toLowerCase()==="yes",answers.includeJSResources.toLowerCase()==="yes");
+        });
+}
 program
     .command('html2fragments')
     .alias('u')
     .description('Generate fragments collection out static html page')
-    .option('-c, --collectionName [value]', 'Specify the collection name')
-    .option('-f, --file [value]', 'Specify the html file path')
-    .option('-s, --groupResources [value]', 'Group all of the CSS resources in one fragment')
-    .option('-j, --includeJSResources [value]', 'Include javascript resources, this will create a new fragment which will include all of the js references')
     .action(function (design, args) {
-
-        html2fragments.start(design.collectionName,design.file,design.groupResources.toLowerCase()==="yes",design.includeJSResources.toLowerCase()==="yes");
-    });
+        askMe()
+            });
 program.parse(process.argv);
 
 
