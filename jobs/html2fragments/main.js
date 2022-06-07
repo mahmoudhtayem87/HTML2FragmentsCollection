@@ -28,10 +28,21 @@ function elementParser(el,componentId)
             var currentComponent = componentsList.filter(com=> com.Id === componentId)[0];
             el.setAttribute("data-lfr-background-image-id",`bgImage_${currentComponent.randomIdCode++}`);
     }
-    if (el.querySelectorAll("*").length > 0) {
-        el.querySelectorAll('*').forEach(sub_element => {
+    if (el.querySelectorAll("*").length > 0)
+    {
+        el.querySelectorAll('*').forEach(sub_element =>
+        {
             if (sub_element.nodeType === 1 && sub_element.parentNode === el)
-                elementParser(sub_element,componentId);
+            {
+                if (sub_element.tagName.toLowerCase()=== "p")
+                {
+                    fixElement(sub_element,componentId);
+                }
+                else
+                {
+                    elementParser(sub_element,componentId);
+                }
+            }
         });
     }else{
 
@@ -86,6 +97,10 @@ function fixElement(el,componentId)
             el.setAttribute("data-lfr-editable-type","rich-text");
             break;
         }
+        case "br":case "hr":case "ol":case "ul":
+        {
+            break;
+        }
         default:
             el.setAttribute("data-lfr-editable-id","Text_"+currentComponent.randomIdCode++);
             el.setAttribute("data-lfr-editable-type","text");
@@ -118,6 +133,23 @@ function prepareResourcesInjectionHTML()
     resources_css_list.forEach((item)=>{
         html+=`<link rel="stylesheet" href="[resources:${item}]" type="text/css">\n`;
     });
+    if (groupResources)
+    {
+        html+=` \n[#assign isEdit=false]
+            [#if themeDisplay.isSignedIn()]
+            [#assign req = request.getRequest()]
+            [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
+            [#if originalRequest.getParameter("p_l_mode")??]
+            [#assign isEdit=true]
+            [/#if]
+            [/#if]
+            
+            [#if isEdit]
+            <div class="alert alert-info p-4">
+              Resources "CSS" Loader Component - Header Resources Area
+            </div>
+            [/#if]`;
+    }
     return html;
 }
 function processFragmentsFolders()
@@ -225,7 +257,8 @@ async function compressCollection()
     await compressing.zip.compressDir(projectFolder, `${projectRootFolder}/ImportPackage.zip`);
 
 }
-async function processCSSFile(_path) {
+async function processCSSFile(_path)
+{
     var path = helpers.relativePathToFullPath(htmlFile,_path);
     if (helpers.getFileExtension(path) != ".css")
         return;
@@ -239,7 +272,8 @@ async function processCSSFile(_path) {
         console.log(`Could not load the style file: ${path}`);
     }
 }
-async function fixAndSaveCSS() {
+async function fixAndSaveCSS()
+{
     for (const element of root.querySelectorAll(`[rel = 'stylesheet']`)) {
         processCSSFile(element.getAttribute('href'));
     }
@@ -282,7 +316,8 @@ function getFixedCSS(filePath)
     });
     return csstree.generate(ast);
 }
-async function processJSFile(_path) {
+async function processJSFile(_path)
+{
     var path = helpers.relativePathToFullPath(htmlFile,_path);
     if (helpers.getFileExtension(path) != ".js")
         return;
