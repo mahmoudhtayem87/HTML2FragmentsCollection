@@ -8,11 +8,11 @@ const csstree = require('css-tree');
 
 const componentSelectorAtt = "liferay-component-type";
 const componentNameAtt = "liferay-component-name";
-var _componentId = 0 ;
+var _componentId = 0;
 
 var groupResources = false;
 var componentsList = [];
-var collectionFolderPath="";
+var collectionFolderPath = "";
 var projectFolder = "";
 var projectRootFolder = "";
 var collectionName = "";
@@ -21,44 +21,34 @@ var root = null;
 var resources_css_list = [];
 var resources_js_list = [];
 
-function elementParser(el,componentId)
-{
+function elementParser(el, componentId) {
     //data-lfr-background-image-id="unique-id"
-    if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image")!=-1)
-    {
-            var currentComponent = componentsList.filter(com=> com.Id === componentId)[0];
-            el.setAttribute("data-lfr-background-image-id",`bgImage_${currentComponent.randomIdCode++}`);
+    if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image") != -1) {
+        var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
+        el.setAttribute("data-lfr-background-image-id", `bgImage_${currentComponent.randomIdCode++}`);
     }
-    if (el.querySelectorAll("*").length > 0)
-    {
-        el.querySelectorAll('*').forEach(sub_element =>
-        {
-            if (sub_element.nodeType === 1 && sub_element.parentNode === el)
-            {
-                if (sub_element.tagName.toLowerCase()=== "p")
-                {
-                    fixElement(sub_element,componentId);
-                }
-                else
-                {
-                    elementParser(sub_element,componentId);
+    if (el.querySelectorAll("*").length > 0) {
+        el.querySelectorAll('*').forEach(sub_element => {
+            if (sub_element.nodeType === 1 && sub_element.parentNode === el) {
+                if (sub_element.tagName.toLowerCase() === "p") {
+                    fixElement(sub_element, componentId);
+                } else {
+                    elementParser(sub_element, componentId);
                 }
             }
         });
-    }else{
+    } else {
 
         if (el.nodeType === 1) {
-            fixElement(el,componentId);
+            fixElement(el, componentId);
         }
     }
 }
-function fixElement(el,componentId)
-{
-    var currentComponent = componentsList.filter(com=> com.Id === componentId)[0];
-    switch (el.tagName.toLowerCase())
-    {
-        case "img":
-        {
+
+function fixElement(el, componentId) {
+    var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
+    switch (el.tagName.toLowerCase()) {
+        case "img": {
             el.replaceWith(`
                             <lfr-editable id="Image_${currentComponent.randomIdCode++}" type="image">
                                 <img src=""/>
@@ -66,8 +56,7 @@ function fixElement(el,componentId)
                            `);
             break;
         }
-        case "a":
-        {
+        case "a": {
             el.replaceWith(`
                             <lfr-editable id="link_${currentComponent.randomIdCode++}" type="link">
                                 <a>Link Button</a>
@@ -75,10 +64,9 @@ function fixElement(el,componentId)
                            `);
             break;
         }
-        case "i":
-        {
-            var configurationKey = "icon"+currentComponent.randomIdCode++;
-            el.setAttribute("class","${configuration." +configurationKey+"}");
+        case "i": {
+            var configurationKey = "icon" + currentComponent.randomIdCode++;
+            el.setAttribute("class", "${configuration." + configurationKey + "}");
             var configurationEntry = {
                 "name": configurationKey,
                 "label": configurationKey,
@@ -92,32 +80,33 @@ function fixElement(el,componentId)
             currentComponent.configuration.push(configurationEntry);
             break;
         }
-        case "p":
-        {
-            el.setAttribute("data-lfr-editable-id","Text_"+currentComponent.randomIdCode++);
-            el.setAttribute("data-lfr-editable-type","rich-text");
+        case "p": {
+            el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
+            el.setAttribute("data-lfr-editable-type", "rich-text");
             break;
         }
-        case "br":case "hr":case "ol":case "ul":
-        {
+        case "br":
+        case "hr":
+        case "ol":
+        case "ul": {
             break;
         }
         default:
-            el.setAttribute("data-lfr-editable-id","Text_"+currentComponent.randomIdCode++);
-            el.setAttribute("data-lfr-editable-type","text");
+            el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
+            el.setAttribute("data-lfr-editable-type", "text");
             break;
     }
 }
-function processFragment(htmlElement,componentName)
-{
-    componentsList.push({name:componentName,randomIdCode:0,Id:_componentId,configuration:[],html:""});
-    elementParser(htmlElement,_componentId);
-    var currentComponent = componentsList.filter(com=> com.Id === _componentId)[0];
+
+function processFragment(htmlElement, componentName) {
+    componentsList.push({name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: ""});
+    elementParser(htmlElement, _componentId);
+    var currentComponent = componentsList.filter(com => com.Id === _componentId)[0];
     currentComponent.html = htmlElement.toString();
-    _componentId=_componentId+1;
+    _componentId = _componentId + 1;
 }
-function getFragmentDescriptionFile(component)
-{
+
+function getFragmentDescriptionFile(component) {
     var obj = {
         "cssPath": "styles.css",
         "configurationPath": "configuration.json",
@@ -128,15 +117,14 @@ function getFragmentDescriptionFile(component)
     };
     return JSON.stringify(obj);
 }
-function prepareResourcesInjectionHTML()
-{
-    var html="";
-    resources_css_list.forEach((item)=>{
-        html+=`<link rel="stylesheet" href="[resources:${item}]" type="text/css">\n`;
+
+function prepareResourcesInjectionHTML() {
+    var html = "";
+    resources_css_list.forEach((item) => {
+        html += `<link rel="stylesheet" href="[resources:${item}]" type="text/css">\n`;
     });
-    if (groupResources)
-    {
-        html+=` \n[#assign isEdit=false]
+    if (groupResources) {
+        html += ` \n[#assign isEdit=false]
             [#if themeDisplay.isSignedIn()]
             [#assign req = request.getRequest()]
             [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
@@ -153,14 +141,14 @@ function prepareResourcesInjectionHTML()
     }
     return html;
 }
-function processFragmentsFolders()
-{
+
+function processFragmentsFolders() {
     var prom = new Promise(function (resolve, reject) {
-        componentsList.forEach(component=>{
-            var componentfolder = `${collectionFolderPath}/${component.name.toLowerCase().replace(" ","-")}`;
+        componentsList.forEach(component => {
+            var componentfolder = `${collectionFolderPath}/${component.name.toLowerCase().replace(" ", "-")}`;
             fse.ensureDir(componentfolder, async err => {
-                var resources = groupResources?"":prepareResourcesInjectionHTML();
-                await helpers.saveFile(`${componentfolder}/index.html`,resources+ component.html);
+                var resources = groupResources ? "" : prepareResourcesInjectionHTML();
+                await helpers.saveFile(`${componentfolder}/index.html`, resources + component.html);
                 await helpers.saveFile(`${componentfolder}/configuration.json`, getComponentConfigurations(component));
                 await helpers.saveFile(`${componentfolder}/fragment.json`, getFragmentDescriptionFile(component));
                 await helpers.saveFile(`${componentfolder}/main.js`, "");
@@ -171,45 +159,44 @@ function processFragmentsFolders()
     });
     return prom;
 }
-function getComponentConfigurations(component)
-{
+
+function getComponentConfigurations(component) {
     var configurationObj = {
         fieldSets: [
             {
-                fields: [
-                ]
+                fields: []
             }
         ]
     };
-    component.configuration.forEach(config=>{
+    component.configuration.forEach(config => {
         configurationObj.fieldSets[0].fields.push(config);
     });
     return JSON.stringify(configurationObj);
 }
-function htmlParserInit()
-{
+
+function htmlParserInit() {
     const buffer = fs.readFileSync(htmlFile);
     var htmlFileContent = buffer.toString();
     root = HTMLParser.parse(htmlFileContent);
 }
-function processComponents()
-{
-    root.querySelectorAll(`[${componentSelectorAtt} = 'component']`).forEach(element=>{
-        console.log("Processing component:"+element.getAttribute(componentNameAtt));
-        processFragment(element,element.getAttribute(componentNameAtt));
-        console.log("Processing component:"+element.getAttribute(componentNameAtt) + " completed!");
+
+function processComponents() {
+    root.querySelectorAll(`[${componentSelectorAtt} = 'component']`).forEach(element => {
+        console.log("Processing component:" + element.getAttribute(componentNameAtt));
+        processFragment(element, element.getAttribute(componentNameAtt));
+        console.log("Processing component:" + element.getAttribute(componentNameAtt) + " completed!");
     });
 }
-async function createCollectionDescriptionFile()
-{
-    var jsonContent ={
+
+async function createCollectionDescriptionFile() {
+    var jsonContent = {
         description: "",
         name: collectionName
     }
-    await helpers.saveFile(`${collectionFolderPath}/collection.json`,JSON.stringify(jsonContent));
+    await helpers.saveFile(`${collectionFolderPath}/collection.json`, JSON.stringify(jsonContent));
 }
-async function createCollectionPackageJSON()
-{
+
+async function createCollectionPackageJSON() {
     var obj = {
         "name": collectionName,
         "description": "Auto Generated Fragments Collection",
@@ -241,26 +228,26 @@ async function createCollectionPackageJSON()
             "generator-liferay-fragments": "1.10.0"
         }
     };
-    await helpers.saveFile(`${projectFolder}/package.json`,JSON.stringify(obj));
+    await helpers.saveFile(`${projectFolder}/package.json`, JSON.stringify(obj));
 }
-async function createLiferayNPMBundlerConfigJS()
-{
+
+async function createLiferayNPMBundlerConfigJS() {
     var obj = "module.exports = require('generator-liferay-fragments').getBundlerConfig();\n";
-    await helpers.saveFile(`${projectFolder}/liferay-npm-bundler.config.js`,obj);
+    await helpers.saveFile(`${projectFolder}/liferay-npm-bundler.config.js`, obj);
 }
-async function createLiferayDeployFragmentsJSON()
-{
-    var obj = {"companyWebId":"liferay.com","groupKey":"Guest"};
-    await helpers.saveFile(`${projectFolder}/liferay-deploy-fragments.json`,JSON.stringify(obj));
+
+async function createLiferayDeployFragmentsJSON() {
+    var obj = {"companyWebId": "liferay.com", "groupKey": "Guest"};
+    await helpers.saveFile(`${projectFolder}/liferay-deploy-fragments.json`, JSON.stringify(obj));
 }
-async function compressCollection()
-{
+
+async function compressCollection() {
     await compressing.zip.compressDir(projectFolder, `${projectRootFolder}/ImportPackage.zip`);
 
 }
-async function processCSSFile(_path)
-{
-    var path = helpers.relativePathToFullPath(htmlFile,_path);
+
+async function processCSSFile(_path) {
+    var path = helpers.relativePathToFullPath(htmlFile, _path);
     if (helpers.getFileExtension(path) != ".css")
         return;
     if (fse.pathExistsSync(path)) {
@@ -273,19 +260,19 @@ async function processCSSFile(_path)
         console.log(`Could not load the style file: ${path}`);
     }
 }
-async function fixAndSaveCSS()
-{
+
+async function fixAndSaveCSS() {
     for (const element of root.querySelectorAll(`[rel = 'stylesheet']`)) {
         processCSSFile(element.getAttribute('href'));
     }
 }
-function prepareJSResourcesInjectionHTML()
-{
-    var html="";
-    resources_js_list.forEach((item)=>{
-        html+=`<script src="[resources:${item}]"></script>\n`;
+
+function prepareJSResourcesInjectionHTML() {
+    var html = "";
+    resources_js_list.forEach((item) => {
+        html += `<script src="[resources:${item}]"></script>\n`;
     });
-    html+=` \n[#assign isEdit=false]
+    html += ` \n[#assign isEdit=false]
             [#if themeDisplay.isSignedIn()]
             [#assign req = request.getRequest()]
             [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
@@ -301,25 +288,22 @@ function prepareJSResourcesInjectionHTML()
             [/#if]`;
     return html;
 }
-function getFixedCSS(filePath)
-{
+
+function getFixedCSS(filePath) {
     var content = helpers.readFileContent(filePath);
     const ast = csstree.parse(content);
     csstree.walk(ast, (node) => {
         if (node.type === 'Selector') {
-            node.children.unshift({"type":"IdSelector","loc":null,"name":"wrapper "});
+            node.children.unshift({"type": "IdSelector", "loc": null, "name": "wrapper "});
+        } else if (node.type === 'Url') {
+            processCSSFile(node.value);
         }
-        else
-            if (node.type === 'Url')
-            {
-                processCSSFile(node.value);
-            }
     });
     return csstree.generate(ast);
 }
-async function processJSFile(_path)
-{
-    var path = helpers.relativePathToFullPath(htmlFile,_path);
+
+async function processJSFile(_path) {
+    var path = helpers.relativePathToFullPath(htmlFile, _path);
     if (helpers.getFileExtension(path) != ".js")
         return;
     if (fse.pathExistsSync(path)) {
@@ -332,20 +316,29 @@ async function processJSFile(_path)
         console.log(`Could not load the JS file: ${path}`);
     }
 }
-function SaveJSScripts()
-{
+
+async function SaveJSScripts() {
+    var index = 0;
     for (const element of root.querySelectorAll(`script`)) {
-        processJSFile(element.getAttribute("src"));
+        if (element.getAttribute("src")) {
+            processJSFile(element.getAttribute("src"));
+        } else {
+            await fse.ensureDir(`${collectionFolderPath}/resources`);
+            resources_js_list.push(`page_script_${index}.js`);
+            await helpers.saveFile(`${collectionFolderPath}/resources/page_script_${index}.js`, element.innerHTML.toString());
+            index+=1;
+        }
     }
 }
-function start(_collectionName,htmlFilePath,_groupStyles,_includeJSResources)
-{
+
+function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
+    console.log(htmlFilePath);
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
-    collectionName=_collectionName;
+    collectionName = _collectionName;
     var currentDate = helpers.getDate();
-    collectionFolderPath = `./auto-generated-fragments/${currentDate}/${collectionName.replace(" ","-")}/src/${collectionName.replace(" ","-")}`;
-    projectFolder = `./auto-generated-fragments/${currentDate}/${collectionName.replace(" ","-")}/`;
+    collectionFolderPath = `./auto-generated-fragments/${currentDate}/${collectionName.replace(" ", "-")}/src/${collectionName.replace(" ", "-")}`;
+    projectFolder = `./auto-generated-fragments/${currentDate}/${collectionName.replace(" ", "-")}/`;
     projectRootFolder = `./auto-generated-fragments/${currentDate}/`;
     fse.ensureDir(collectionFolderPath, async err => {
         htmlParserInit();
@@ -355,13 +348,23 @@ function start(_collectionName,htmlFilePath,_groupStyles,_includeJSResources)
         await createCollectionPackageJSON();
         await createLiferayDeployFragmentsJSON();
         await createLiferayNPMBundlerConfigJS();
-        if (groupResources)
-        {
-            componentsList.push({name:"LayoutResourcesComponent",randomIdCode:0,Id:-1,configuration:[],html:prepareResourcesInjectionHTML()});
+        if (groupResources) {
+            componentsList.push({
+                name: "LayoutResourcesComponent",
+                randomIdCode: 0,
+                Id: -1,
+                configuration: [],
+                html: prepareResourcesInjectionHTML()
+            });
         }
-        if (_includeJSResources)
-        {
-            componentsList.push({name:"LayoutJavaScriptComponent",randomIdCode:0,Id:-2,configuration:[],html:prepareJSResourcesInjectionHTML()});
+        if (_includeJSResources) {
+            componentsList.push({
+                name: "LayoutJavaScriptComponent",
+                randomIdCode: 0,
+                Id: -2,
+                configuration: [],
+                html: prepareJSResourcesInjectionHTML()
+            });
         }
         processComponents();
         await processFragmentsFolders();

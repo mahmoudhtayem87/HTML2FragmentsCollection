@@ -31,7 +31,7 @@ function askMe()
             }
         ])
         .then(answers => {
-            html2fragments.start(answers.collectionName,answers.file,answers.groupResources.toLowerCase()==="yes",answers.includeJSResources.toLowerCase()==="yes");
+            html2fragments.start(answers.collectionName,answers.file.toString(),answers.groupResources.toLowerCase()==="yes",answers.includeJSResources.toLowerCase()==="yes");
         });
 }
 program

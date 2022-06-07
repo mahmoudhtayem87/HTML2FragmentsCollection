@@ -12,6 +12,11 @@ function buildPathTree(filePath) {
 }
 
 function readFileContent(filePath) {
+    if (!fs.pathExistsSync(filePath))
+    {
+        console.log(`Could not load file: ${filePath}`);
+        return "";
+    }
     const buffer = fs.readFileSync(filePath);
     var fileContent = buffer.toString();
     return fileContent;
@@ -50,6 +55,7 @@ function getFileExtension(fileFullPath)
     return pathObj.ext;
 }
 function relativePathToFullPath(filePath, relativePath) {
+
     var _dirTree = buildPathTree(filePath);
     var dirTree = JSON.parse(JSON.stringify(_dirTree));
     var path = `/${dirTree.join('/')}/${relativePath.replace('./', "")}`;
