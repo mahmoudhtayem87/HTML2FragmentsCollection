@@ -12,5 +12,7 @@ The ultimate goal is to split the raw HTML into separate component and then conv
 ### **Command Parameters**
 - **c**: Use this param to specify your auto generated fragment collection
 - **f**: Use this param to specify the html template file path "full path is required"
-- **s**: Use this param to specify if you would like to create one fragment which will include all of the styles so you will be able to use it once in the master page, "no" will include the styles in each fragment.
-  `
+- **s**: Use this param to specify if you would like to create one fragment which will include all the styles, so you will be able to use it once in the master page, "no" will include the styles in each fragment.
+- **j**: Use this param to specify if you would like to create one fragment which will include all the JavaScripts, so you will be able to use it once in the master page, "no" will not include javascripts.
+
+`

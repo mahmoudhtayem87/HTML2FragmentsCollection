@@ -18,6 +18,7 @@ var collectionName = "";
 var htmlFile;
 var root = null;
 var resources_css_list = [];
+var resources_js_list = [];
 
 function elementParser(el,componentId)
 {
@@ -243,6 +244,28 @@ async function fixAndSaveCSS() {
         processCSSFile(element.getAttribute('href'));
     }
 }
+function prepareJSResourcesInjectionHTML()
+{
+    var html="";
+    resources_js_list.forEach((item)=>{
+        html+=`<script src="[resources:${item}]"></script>\n`;
+    });
+    html+=` \n[#assign isEdit=false]
+            [#if themeDisplay.isSignedIn()]
+            [#assign req = request.getRequest()]
+            [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
+            [#if originalRequest.getParameter("p_l_mode")??]
+            [#assign isEdit=true]
+            [/#if]
+            [/#if]
+            
+            [#if isEdit]
+            <div class="alert alert-info p-4">
+              Java Script Loader Component - Footer Resources Area
+            </div>
+            [/#if]`;
+    return html;
+}
 function getFixedCSS(filePath)
 {
     var content = helpers.readFileContent(filePath);
@@ -259,7 +282,27 @@ function getFixedCSS(filePath)
     });
     return csstree.generate(ast);
 }
-function start(_collectionName,htmlFilePath,_groupStyles)
+async function processJSFile(_path) {
+    var path = helpers.relativePathToFullPath(htmlFile,_path);
+    if (helpers.getFileExtension(path) != ".js")
+        return;
+    if (fse.pathExistsSync(path)) {
+        var jsContent = helpers.readFileContent(path);
+        var jsFileName = helpers.getFileName(path);
+        resources_js_list.push(jsFileName);
+        await fse.ensureDir(`${collectionFolderPath}/resources`);
+        await helpers.saveFile(`${collectionFolderPath}/resources/${jsFileName}`, jsContent);
+    } else {
+        console.log(`Could not load the JS file: ${path}`);
+    }
+}
+function SaveJSScripts()
+{
+    for (const element of root.querySelectorAll(`script`)) {
+        processJSFile(element.getAttribute("src"));
+    }
+}
+function start(_collectionName,htmlFilePath,_groupStyles,_includeJSResources)
 {
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
@@ -270,6 +313,7 @@ function start(_collectionName,htmlFilePath,_groupStyles)
     projectRootFolder = `./auto-generated-fragments/${currentDate}/`;
     fse.ensureDir(collectionFolderPath, async err => {
         htmlParserInit();
+        SaveJSScripts();
         await fixAndSaveCSS();
         await createCollectionDescriptionFile();
         await createCollectionPackageJSON();
@@ -278,6 +322,10 @@ function start(_collectionName,htmlFilePath,_groupStyles)
         if (groupResources)
         {
             componentsList.push({name:"LayoutResourcesComponent",randomIdCode:0,Id:-1,configuration:[],html:prepareResourcesInjectionHTML()});
+        }
+        if (_includeJSResources)
+        {
+            componentsList.push({name:"LayoutJavaScriptComponent",randomIdCode:0,Id:-2,configuration:[],html:prepareJSResourcesInjectionHTML()});
         }
         processComponents();
         await processFragmentsFolders();
