@@ -6,7 +6,7 @@ The ultimate goal is to split the raw HTML into separate component and then conv
 # **How to use**
 - Install the command-line using the following command <br/>`npm i html-2-fragments-collection -g`
 - Edit your HTML file and for each html component you would like to convert to Liferay Fragment add the following attributes
-  - **liferay-component-type** : Set the value of this attribute to "component"
+  - **liferay-component-type** : Set the value of this attribute to "component" or "container"
   - **liferay-component-name** : Set the value of this attribute to the preferred collection title
 - Run the following command to generate the fragments' collection <br/> `liferay-design html2fragments` <br/>
 

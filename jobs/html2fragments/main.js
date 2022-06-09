@@ -44,7 +44,14 @@ function elementParser(el, componentId) {
         }
     }
 }
-
+function containerParser(el, componentId) {
+    var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
+    if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image") != -1) {
+        el.setAttribute("data-lfr-background-image-id", `bgImage_${currentComponent.randomIdCode++}`);
+    }
+    el.innerHTML = " <lfr-drop-zone></lfr-drop-zone>";
+    currentComponent.html = el.toString();
+}
 function fixElement(el, componentId) {
     var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
     switch (el.tagName.toLowerCase()) {
@@ -101,6 +108,15 @@ function fixElement(el, componentId) {
 function processFragment(htmlElement, componentName) {
     componentsList.push({name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: ""});
     elementParser(htmlElement, _componentId);
+    var currentComponent = componentsList.filter(com => com.Id === _componentId)[0];
+    currentComponent.html = htmlElement.toString();
+    _componentId = _componentId + 1;
+}
+
+function processContainerFragment(htmlElement, componentName) {
+
+    componentsList.push({name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: ""});
+    containerParser(htmlElement, _componentId);
     var currentComponent = componentsList.filter(com => com.Id === _componentId)[0];
     currentComponent.html = htmlElement.toString();
     _componentId = _componentId + 1;
@@ -185,6 +201,13 @@ function processComponents() {
         console.log("Processing component:" + element.getAttribute(componentNameAtt));
         processFragment(element, element.getAttribute(componentNameAtt));
         console.log("Processing component:" + element.getAttribute(componentNameAtt) + " completed!");
+    });
+}
+function processContainers() {
+    root.querySelectorAll(`[${componentSelectorAtt} = 'container']`).forEach(element => {
+        console.log("Processing container:" + element.getAttribute(componentNameAtt));
+        processContainerFragment(element, element.getAttribute(componentNameAtt));
+        console.log("Processing container:" + element.getAttribute(componentNameAtt) + " completed!");
     });
 }
 
@@ -330,7 +353,6 @@ async function SaveJSScripts() {
         }
     }
 }
-
 function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
@@ -366,9 +388,9 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
             });
         }
         processComponents();
+        processContainers();
         await processFragmentsFolders();
         await compressCollection();
-
     });
 }
 
