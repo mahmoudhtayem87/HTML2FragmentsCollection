@@ -183,6 +183,7 @@ function fixElement(el, componentId) {
                 break;
             }
             case "i": {
+
                 var configurationKey = "icon" + currentComponent.randomIdCode++;
                 el.setAttribute("class", "${configuration." + configurationKey + "}");
                 var configurationEntry = {
@@ -193,9 +194,11 @@ function fixElement(el, componentId) {
                         "placeholder": "Placeholder"
                     },
                     "dataType": "string",
-                    "defaultValue": ""
+                    "defaultValue": "star"
                 };
-                el.setAttribute("title",`${configurationKey}`)
+                el.setAttribute("title",`${configurationKey}`);
+                el.tagName = "span";
+                el.set_content("[@clay[\"icon\"] symbol=\"${configuration." + configurationKey + "}\" /]");
                 currentComponent.configuration.push(configurationEntry);
                 break;
             }
