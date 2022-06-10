@@ -30,7 +30,9 @@ function elementParser(el, componentId) {
     if (el.querySelectorAll("*").length > 0) {
         el.querySelectorAll('*').forEach(sub_element => {
             if (sub_element.nodeType === 1 && sub_element.parentNode === el) {
-                if (sub_element.tagName.toLowerCase() === "p") {
+                if (el.getAttribute("liferay-tag")) {
+                    fixElement(el, componentId);
+                } else if (sub_element.tagName.toLowerCase() === "p") {
                     fixElement(sub_element, componentId);
                 } else {
                     elementParser(sub_element, componentId);
@@ -44,6 +46,7 @@ function elementParser(el, componentId) {
         }
     }
 }
+
 function containerParser(el, componentId) {
     var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
     if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image") != -1) {
@@ -52,57 +55,168 @@ function containerParser(el, componentId) {
     el.innerHTML = " <lfr-drop-zone></lfr-drop-zone>";
     currentComponent.html = el.toString();
 }
+
+function GenerateNavigationADT(el, componentId) {
+    var singleItem = el.querySelectorAll("[liferay-tag='navigation-single-item']")[0];
+    singleItem.querySelectorAll("a")[0].innerHTML = "${navigationEntry.getName()}";
+    singleItem.querySelectorAll("a")[0].setAttribute("href", "${navigationEntry.getURL()}");
+    singleItem.classList.add("{selected}");
+
+    var navigationItemWithSub= el.querySelectorAll("[liferay-tag='navigation-item-with-sub']")[0];
+    navigationItemWithSub.querySelectorAll("[liferay-tag='navigation-sub-label']")[0].set_content("${navigationEntry.getName()}");
+
+    var navigationRootSub = el.querySelectorAll("[liferay-tag='navigation-root-sub']")[0];
+    navigationRootSub.set_content(`
+     <#list navigationEntry.getChildren() as SubEntry>
+         <#assign subActive="" />
+             <#if SubEntry.isSelected()>
+                <#assign subActive=selectedClass>
+             </#if>
+             ${singleItem.toString().replace("{selected}","${subActive}")}
+      </#list>
+    `);
+
+    var menuRoot = el.querySelectorAll("[liferay-tag='navigation-root']")[0];
+    menuRoot.set_content(`
+    <#assign selectedClass = "current" />
+     <#list entries as navigationEntry>
+            <#if navigationEntry.hasChildren()>
+                <#assign uniqueId=.now?string["HHmmssSSS"]?number />
+                ${navigationItemWithSub.toString()}
+                <#else>
+                    <#assign active="" />
+                    <#if navigationEntry.isSelected()>
+                        <#assign active=selectedClass>
+                    </#if>
+                    ${singleItem.toString().replace("{selected}","${active}")}
+                     </#if>
+        </#list>
+    `);
+    fse.ensureDir(`${projectRootFolder}/ADT`,()=>{
+        helpers.saveFile(`${projectRootFolder}/ADT/navigationMenu.ftl`,menuRoot.toString());
+        console.log("Freemarker template for navigation has been created!");
+    });
+}
+
 function fixElement(el, componentId) {
     var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
-    switch (el.tagName.toLowerCase()) {
-        case "img": {
-            el.replaceWith(`
+    if (el.getAttribute("liferay-tag")) {
+        console.log("inside fixing");
+        console.log(el.getAttribute("liferay-tag"));
+        var tag = el.getAttribute("liferay-tag");
+        switch (tag) {
+            case "search":
+                el.innerHTML = "[@liferay.search_bar /]";
+                break;
+            case "avatar":
+                el.innerHTML = "[@liferay.user_personal_bar /]";
+                break;
+            case "language":
+                el.innerHTML = "[@liferay.languages /]";
+                break;
+            case "navigation":
+                GenerateNavigationADT(el, componentId);
+                var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
+                el.innerHTML = `[#attempt]
+              [#assign navMenuID = configuration.navigationMenu?number]
+              [#assign templateId = configuration.navigationMenuTemplate?number]
+              [#assign ddmTemplateLocalService =
+              serviceLocator.findService("com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService")]
+              [#assign template = ddmTemplateLocalService.fetchDDMTemplate(templateId)]
+              [#assign siteNavigationMenuLocalService =
+              serviceLocator.findService("com.liferay.site.navigation.service.SiteNavigationMenuLocalService")]
+              [#assign navigationMenu = siteNavigationMenuLocalService.fetchSiteNavigationMenu(navMenuID)]
+              [@liferay_site_navigation["navigation-menu"]
+              ddmTemplateGroupId=template.groupId
+              ddmTemplateKey=template.templateKey
+              displayDepth=1
+              expandedLevels="auto"
+              rootItemType="absolute"
+              rootItemLevel=0
+              siteNavigationMenuId=navigationMenu.siteNavigationMenuId /]
+              [#recover]
+              <li class="nav-item">
+              <span class="nav-link">
+                            <small>Menu is temporarily unavailable, please make sure to enable service locator and set a valid navigation menu id and navigation menu template in the fragment configurations</small>
+                            </span>
+              </li>
+              [/#attempt]`;
+                //adding navigation menu configuration
+                currentComponent.configuration.push({
+                    "name": "navigationMenu",
+                    "label": "Navigation Menu ID",
+                    "type": "text",
+                    "typeOptions": {
+                        "placeholder": "Placeholder"
+                    },
+                    "dataType": "string",
+                    "defaultValue": ""
+                });
+                currentComponent.configuration.push({
+                    "name": "navigationMenuTemplate",
+                    "label": "Navigation Menu Template ID",
+                    "type": "text",
+                    "typeOptions": {
+                        "placeholder": "Placeholder"
+                    },
+                    "dataType": "string",
+                    "defaultValue": ""
+                });
+                break;
+        }
+    } else {
+        switch (el.tagName.toLowerCase()) {
+            case "img": {
+                el.replaceWith(`
                             <lfr-editable id="Image_${currentComponent.randomIdCode++}" type="image">
                                 <img src=""/>
                             </lfr-editable>
                            `);
-            break;
-        }
-        case "a": {
-            el.replaceWith(`
+                break;
+            }
+            case "a": {
+                el.replaceWith(`
                             <lfr-editable id="link_${currentComponent.randomIdCode++}" type="link">
                                 <a>Link Button</a>
                             </lfr-editable>
                            `);
-            break;
+                break;
+            }
+            case "i": {
+                var configurationKey = "icon" + currentComponent.randomIdCode++;
+                el.setAttribute("class", "${configuration." + configurationKey + "}");
+                var configurationEntry = {
+                    "name": configurationKey,
+                    "label": configurationKey,
+                    "type": "text",
+                    "typeOptions": {
+                        "placeholder": "Placeholder"
+                    },
+                    "dataType": "string",
+                    "defaultValue": ""
+                };
+                el.setAttribute("title",`${configurationKey}`)
+                currentComponent.configuration.push(configurationEntry);
+                break;
+            }
+            case "p": {
+                el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
+                el.setAttribute("data-lfr-editable-type", "rich-text");
+                break;
+            }
+            case "br":
+            case "hr":
+            case "ol":
+            case "ul": {
+                break;
+            }
+            default:
+                el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
+                el.setAttribute("data-lfr-editable-type", "text");
+                break;
         }
-        case "i": {
-            var configurationKey = "icon" + currentComponent.randomIdCode++;
-            el.setAttribute("class", "${configuration." + configurationKey + "}");
-            var configurationEntry = {
-                "name": configurationKey,
-                "label": configurationKey,
-                "type": "text",
-                "typeOptions": {
-                    "placeholder": "Placeholder"
-                },
-                "dataType": "string",
-                "defaultValue": ""
-            };
-            currentComponent.configuration.push(configurationEntry);
-            break;
-        }
-        case "p": {
-            el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
-            el.setAttribute("data-lfr-editable-type", "rich-text");
-            break;
-        }
-        case "br":
-        case "hr":
-        case "ol":
-        case "ul": {
-            break;
-        }
-        default:
-            el.setAttribute("data-lfr-editable-id", "Text_" + currentComponent.randomIdCode++);
-            el.setAttribute("data-lfr-editable-type", "text");
-            break;
     }
+
 }
 
 function processFragment(htmlElement, componentName) {
@@ -203,6 +317,7 @@ function processComponents() {
         console.log("Processing component:" + element.getAttribute(componentNameAtt) + " completed!");
     });
 }
+
 function processContainers() {
     root.querySelectorAll(`[${componentSelectorAtt} = 'container']`).forEach(element => {
         console.log("Processing container:" + element.getAttribute(componentNameAtt));
@@ -349,10 +464,11 @@ async function SaveJSScripts() {
             await fse.ensureDir(`${collectionFolderPath}/resources`);
             resources_js_list.push(`page_script_${index}.js`);
             await helpers.saveFile(`${collectionFolderPath}/resources/page_script_${index}.js`, element.innerHTML.toString());
-            index+=1;
+            index += 1;
         }
     }
 }
+
 function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
