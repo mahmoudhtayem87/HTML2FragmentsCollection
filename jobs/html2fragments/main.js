@@ -21,6 +21,8 @@ var root = null;
 var resources_css_list = [];
 var resources_js_list = [];
 
+const icons = helpers.getClayIcons();
+
 function elementParser(el, componentId) {
     //data-lfr-background-image-id="unique-id"
     if (el.getAttribute("style") && el.getAttribute("style").toString().indexOf("background-image") != -1) {
@@ -97,14 +99,14 @@ function GenerateNavigationADT(el, componentId) {
         console.log("Freemarker template for navigation has been created!");
     });
 }
-
 function fixElement(el, componentId) {
     var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
     if (el.getAttribute("liferay-tag")) {
-        console.log("inside fixing");
         console.log(el.getAttribute("liferay-tag"));
         var tag = el.getAttribute("liferay-tag");
         switch (tag) {
+            case "skip":
+                break;
             case "search":
                 el.innerHTML = "[@liferay.search_bar /]";
                 break;
@@ -189,14 +191,17 @@ function fixElement(el, componentId) {
                 var configurationEntry = {
                     "name": configurationKey,
                     "label": configurationKey,
-                    "type": "text",
-                    "typeOptions": {
-                        "placeholder": "Placeholder"
-                    },
+                    "description": "Icons list!",
+                    "type": "select",
                     "dataType": "string",
-                    "defaultValue": "star"
+                    "typeOptions": {
+                        "validValues": icons
+                    },
+                    "defaultValue": icons[0].value
                 };
+                el.parentNode.classList.add("inline-flex");
                 el.setAttribute("title",`${configurationKey}`);
+                el.classList.add("clay-icon");
                 el.tagName = "span";
                 el.set_content("[@clay[\"icon\"] symbol=\"${configuration." + configurationKey + "}\" /]");
                 currentComponent.configuration.push(configurationEntry);
@@ -471,7 +476,45 @@ async function SaveJSScripts() {
         }
     }
 }
-
+async function createCustomJSFile()
+{
+    var script =
+        `function onLanguageChange(event)
+        {
+            e = event || window.event;
+            var target = e.target || e.srcElement;
+            document.location = target.value;
+        }`;
+    resources_js_list.push("lr_custom.js");
+    await fse.ensureDir(`${collectionFolderPath}/resources`);
+    await helpers.saveFile(`${collectionFolderPath}/resources/lr_custom.js`, script);
+}
+async function createCustomCSSFile()
+{
+    var style = `
+    .tbar
+        {
+            z-index : 999!important;
+        }
+    .clay-icon
+        {
+            display:inline-flex;
+            margin:auto!important;
+            
+        }
+    .inline-flex
+        {
+            display:inline-flex!important;
+        }
+    .inline-flex *
+        {
+            margin:auto!important;
+        }
+    `;
+    resources_css_list.push("lr_custom.css");
+    await fse.ensureDir(`${collectionFolderPath}/resources`);
+    await helpers.saveFile(`${collectionFolderPath}/resources/lr_custom.css`, style);
+}
 function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
@@ -488,6 +531,8 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
         await createCollectionPackageJSON();
         await createLiferayDeployFragmentsJSON();
         await createLiferayNPMBundlerConfigJS();
+        await createCustomCSSFile();
+        await createCustomJSFile();
         if (groupResources) {
             componentsList.push({
                 name: "LayoutResourcesComponent",

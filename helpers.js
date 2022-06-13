@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const {pathExistsSync} = require("fs-extra");
 const fse = require('fs-extra');
 const path = require('path');
+const parse = require('svg-parser');
 
 function buildPathTree(filePath) {
     var pathObj = path.parse(filePath);
@@ -76,6 +77,27 @@ function relativePathToFullPath(filePath, relativePath) {
     }
     return path;
 }
+function getIconIdsList(list,el)
+{
+
+    if (el.tagName === "symbol")
+    {
+        list.push({value:el.properties.id, label:el.properties.id.toUpperCase()});
+    }
+    var index=0;
+    while (index < el.children.length)
+    {
+        getIconIdsList(list,el.children[index++]);
+    }
+}
+
+function getClayIcons()
+{
+    const parsed = parse.parse( readFileContent('./jobs/html2fragments/resources/icons/icons.svg'));
+    var icons = [];
+    getIconIdsList(icons,parsed)
+    return icons;
+}
 
 
 
@@ -86,5 +108,6 @@ module.exports = {
     buildPathTree,
     getFileName,
     relativePathToFullPath,
-    getFileExtension
+    getFileExtension,
+    getClayIcons
 }
