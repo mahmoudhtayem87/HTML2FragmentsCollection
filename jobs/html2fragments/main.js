@@ -107,6 +107,9 @@ function fixElement(el, componentId) {
         switch (tag) {
             case "skip":
                 break;
+            case "logo":
+                el.innerHTML = '<a class="navbar-brand" href="${themeDisplay.getURLHome()}"><img src="${htmlUtil.escape(themeDisplay.getCompanyLogo())}" alt="${company.name}" class="img-fluid"> </a>';
+                break;
             case "search":
                 el.innerHTML = "[@liferay.search_bar /]";
                 break;
@@ -370,6 +373,8 @@ async function createCollectionPackageJSON() {
             "react": "16.8.6",
             "react-dom": "16.8.6"
         },
+        "author": "Mahmoud Hussein Tayem",
+        "license": "ISC",
         "devDependencies": {
             "generator-liferay-fragments": "1.10.0"
         }

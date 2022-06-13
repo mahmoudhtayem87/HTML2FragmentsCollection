@@ -89,14 +89,15 @@ function getIconIdsList(list,el)
     {
         getIconIdsList(list,el.children[index++]);
     }
+
 }
 
 function getClayIcons()
 {
     const parsed = parse.parse( readFileContent('./jobs/html2fragments/resources/icons/icons.svg'));
     var icons = [];
-    getIconIdsList(icons,parsed)
-    return icons;
+    getIconIdsList(icons,parsed);
+    return icons.sort((a, b) => (a.value > b.value) ? 1 :  -1 );
 }
 
 
