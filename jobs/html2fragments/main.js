@@ -107,6 +107,9 @@ function fixElement(el, componentId) {
         switch (tag) {
             case "skip":
                 break;
+            case "dropzone":
+                el.innerHTML = "<lfr-drop-zone></lfr-drop-zone>";
+                break;
             case "logo":
                 el.innerHTML = '<a class="navbar-brand" href="${themeDisplay.getURLHome()}"><img src="${htmlUtil.escape(themeDisplay.getCompanyLogo())}" alt="${company.name}" class="img-fluid"> </a>';
                 break;

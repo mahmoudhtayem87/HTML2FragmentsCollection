@@ -19,6 +19,8 @@ This command line has been created to ease the process of converting pure html p
 - **liferay-tag="language"**: Add this tag to any div in your html template, this will be replaced with **language bar** at the time the parser will run.
 - **liferay-tag="logo"**: Add this tag to any element in your html template, this will be replaced with **Liferay Portal Logo and Home URL link**.
 - **liferay-tag="skip"**: Add this tag to any element in your html template to skip parsing the selected element.
+- **liferay-tag="dropzone"**: Add this tag to any element in your html template inside a component to turn that element into a dropzone area.
+
 - Run the following command to generate the fragments' collection:  
     `liferay-design html2fragments`
 - The tool will ask you the following questions in order to start converting your html into a Liferay Fragments Collection
