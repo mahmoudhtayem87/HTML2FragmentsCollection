@@ -94,7 +94,7 @@ function getIconIdsList(list,el)
 
 function getClayIcons()
 {
-    const parsed = parse.parse( readFileContent('./jobs/html2fragments/resources/icons/icons.svg'));
+    const parsed = parse.parse( readFileContent(`${__dirname}/jobs/html2fragments/resources/icons/icons.svg`));
     var icons = [];
     getIconIdsList(icons,parsed);
     return icons.sort((a, b) => (a.value > b.value) ? 1 :  -1 );
