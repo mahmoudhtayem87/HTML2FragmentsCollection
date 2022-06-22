@@ -5,6 +5,26 @@ const fse = require('fs-extra');
 const path = require('path');
 const parse = require('svg-parser');
 
+
+const colorProps = [
+    "color",
+    "background",
+    "background-color",
+    "background-image",
+   " border-color",
+   " border-top-color",
+    "border-right-color",
+    "border-bottom-color",
+    "border-left-color",
+    "outline-color",
+    "text-shadow",
+    "box-shadow"
+];
+function isValidColorProp(propName)
+{
+    return colorProps.filter(prop=> prop === propName).length > 0;
+}
+
 function buildPathTree(filePath) {
     var pathObj = path.parse(filePath);
     var pathDir = pathObj.dir.substring(1, pathObj.dir.length);
@@ -110,5 +130,6 @@ module.exports = {
     getFileName,
     relativePathToFullPath,
     getFileExtension,
-    getClayIcons
+    getClayIcons,
+    isValidColorProp
 }

@@ -11,7 +11,7 @@ function askMe()
             {
                 name: 'file',
                 message: 'Please specify the html file path "full path is required"?',
-                default: ''
+                default: `${__dirname}/example/example-html/index.html`
             },
             {
                 name: 'collectionName',
@@ -41,6 +41,7 @@ program
     .action(function (design, args) {
         askMe()
             });
+
 program.parse(process.argv);
 
 

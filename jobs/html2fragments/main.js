@@ -5,7 +5,9 @@ const helpers = require('../../helpers');
 const fs = require('fs');
 const fse = require('fs-extra');
 const csstree = require('css-tree');
-
+const {saveFile} = require("../../helpers");
+const namer = require('color-namer');
+const _ = require('lodash');
 const componentSelectorAtt = "liferay-component-type";
 const componentNameAtt = "liferay-component-name";
 var _componentId = 0;
@@ -21,6 +23,28 @@ var root = null;
 var resources_css_list = [];
 var resources_js_list = [];
 
+function createStyleBook()
+{
+    var configs = [];
+    colorsArray = _.uniqBy(colorsArray, 'css_original_code');
+    var grouped = _.mapValues(_.groupBy(colorsArray, 'name'),
+        clist => clist.map(color => _.omit(color, 'name')));
+    for (const color in grouped) {
+        var colors = grouped[color][0];
+        configs.push({
+            name: `${color}`,
+            label: `${color.toUpperCase()}`,
+            type: "colorPalette",
+            dataType: "object",
+            defaultValue: {
+                cssClass: `${color}`,
+                rgbValue: `${colors.code}`
+            }
+        });
+    }
+    return configs;
+
+}
 const icons = helpers.getClayIcons();
 
 function elementParser(el, componentId) {
@@ -264,9 +288,23 @@ function getFragmentDescriptionFile(component) {
 
 function prepareResourcesInjectionHTML() {
     var html = "";
+    var configuration = createStyleBook();
+
+    var rootStyles = "";
+    configuration.forEach(config=>{
+        rootStyles+=
+            "--"+
+            config.name+
+            ":"+
+            "${configuration."+
+            config.name+
+            ".rgbValue};\n";
+    });
+    rootStyles = `:root\n{ ${rootStyles} \n}`
     resources_css_list.forEach((item) => {
         html += `<link rel="stylesheet" href="[resources:${item}]" type="text/css">\n`;
     });
+    html+= `<style>\n${rootStyles}\n</style>`;
     if (groupResources) {
         html += ` \n[#assign isEdit=false]
             [#if themeDisplay.isSignedIn()]
@@ -408,8 +446,10 @@ async function processCSSFile(_path) {
         var fixedCSS = getFixedCSS(path);
         var cssFileName = helpers.getFileName(path);
         resources_css_list.push(cssFileName);
-        await fse.ensureDir(`${collectionFolderPath}/resources`);
-        await helpers.saveFile(`${collectionFolderPath}/resources/${cssFileName}`, fixedCSS);
+        cssfiles.push({
+            filePath:`${collectionFolderPath}/resources/${cssFileName}`,
+            content:fixedCSS
+        });
     } else {
         console.log(`Could not load the style file: ${path}`);
     }
@@ -442,17 +482,37 @@ function prepareJSResourcesInjectionHTML() {
             [/#if]`;
     return html;
 }
-
+var colorsArray=[];
+var cssfiles = [];
 function getFixedCSS(filePath) {
     var content = helpers.readFileContent(filePath);
     const ast = csstree.parse(content);
+    var colors=[];
+
     csstree.walk(ast, (node) => {
+        if (node.type === 'Declaration' && helpers.isValidColorProp(node.property) && node.value.type === "Value" && node.value.children.head.data.type==="Hash")
+        {
+            if(colorsArray.filter(color=> color.code === node.value.children.head.data.value).length === 0)
+            {
+                var color_name = namer(`#${node.value.children.head.data.value}`, { pick: ['x11'], distance: 'deltaE' });
+                color_name = color_name.x11.sort((a,b) => (a.distance > b.distance) ? 1 : ((b.distance > a.distance) ? -1 : 0))[0];
+                if (color_name)
+                {
+                    colorsArray.push({
+                        css_original_code:node.value.children.head.data.value,
+                        name:color_name.name,
+                        code:color_name.hex
+                    });
+                }
+            }
+        }
         if (node.type === 'Selector') {
             node.children.unshift({"type": "IdSelector", "loc": null, "name": "wrapper "});
         } else if (node.type === 'Url') {
             processCSSFile(node.value);
         }
     });
+
     return csstree.generate(ast);
 }
 
@@ -523,6 +583,30 @@ async function createCustomCSSFile()
     await fse.ensureDir(`${collectionFolderPath}/resources`);
     await helpers.saveFile(`${collectionFolderPath}/resources/lr_custom.css`, style);
 }
+async function FixCSSAddVars() {
+
+    colorsArray = _.uniqBy(colorsArray, 'css_original_code');
+    var grouped = _.mapValues(_.groupBy(colorsArray, 'name'),
+        clist => clist.map(color => _.omit(color, 'name')));
+    for (const color in grouped) {
+        var colors = grouped[color];
+
+        for( const origianl of colors) {
+            for (var index = 0; index < cssfiles.length; index++) {
+                var fileContent = cssfiles[index].content.replaceAll(`#${origianl.css_original_code}`, `var(--${color})`);
+                cssfiles[index].content = fileContent;
+            }
+        };
+    }
+    await fse.ensureDir(`${collectionFolderPath}/resources`);
+
+    var selector = "#wrapper :root";
+    var pattern = new RegExp(selector.replace(/\./g, "\\.") + "\\s*{[^}]*?}", "gim");
+    for (var index = 0; index < cssfiles.length; index++) {
+        await helpers.saveFile(`${cssfiles[index].filePath}`, cssfiles[index].content.replace(pattern,''));
+    }
+
+}
 function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources) {
     htmlFile = htmlFilePath;
     groupResources = _groupStyles;
@@ -535,6 +619,7 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
         htmlParserInit();
         SaveJSScripts();
         await fixAndSaveCSS();
+        FixCSSAddVars();
         await createCollectionDescriptionFile();
         await createCollectionPackageJSON();
         await createLiferayDeployFragmentsJSON();
@@ -546,7 +631,7 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
                 name: "LayoutResourcesComponent",
                 randomIdCode: 0,
                 Id: -1,
-                configuration: [],
+                configuration: createStyleBook(),
                 html: prepareResourcesInjectionHTML()
             });
         }

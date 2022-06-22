@@ -1,6 +1,6 @@
 {
   "name": "html-2-fragments-collection",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,14 @@
   "author": "Mahmoud Hussein Tayem",
   "license": "ISC",
   "dependencies": {
+    "color-namer": "^1.4.0",
     "commander": "^9.3.0",
     "compressing": "^1.5.1",
     "css-tree": "^2.1.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "inquirer": "^8.2.4",
+    "lodash": "^4.17.21",
     "node-html-parser": "^5.3.3",
     "svg-parser": "^2.0.4"
   }
