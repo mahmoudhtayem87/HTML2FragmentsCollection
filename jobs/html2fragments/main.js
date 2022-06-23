@@ -285,8 +285,8 @@ function getFragmentDescriptionFile(component) {
     };
     return JSON.stringify(obj);
 }
-
-function prepareResourcesInjectionHTML() {
+function prepareStyleBookInjectionHTML()
+{
     var html = "";
     var configuration = createStyleBook();
 
@@ -300,11 +300,31 @@ function prepareResourcesInjectionHTML() {
             config.name+
             ".rgbValue};\n";
     });
-    rootStyles = `:root\n{ ${rootStyles} \n}`
+    rootStyles = `:root\n{ ${rootStyles} \n}`;
+    html+= `<style>\n${rootStyles}\n</style>`;
+    html += ` \n[#assign isEdit=false]
+            [#if themeDisplay.isSignedIn()]
+            [#assign req = request.getRequest()]
+            [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
+            [#if originalRequest.getParameter("p_l_mode")??]
+            [#assign isEdit=true]
+            [/#if]
+            [/#if]
+            
+            [#if isEdit]
+            <div class="alert alert-info p-4">
+              Fragmented Theme Style Book - Header Area
+            </div>
+            [/#if]`;
+    return html;
+}
+function prepareResourcesInjectionHTML() {
+    var html = "";
+
     resources_css_list.forEach((item) => {
         html += `<link rel="stylesheet" href="[resources:${item}]" type="text/css">\n`;
     });
-    html+= `<style>\n${rootStyles}\n</style>`;
+
     if (groupResources) {
         html += ` \n[#assign isEdit=false]
             [#if themeDisplay.isSignedIn()]
@@ -631,10 +651,17 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources)
                 name: "LayoutResourcesComponent",
                 randomIdCode: 0,
                 Id: -1,
-                configuration: createStyleBook(),
+                configuration: [],
                 html: prepareResourcesInjectionHTML()
             });
         }
+        componentsList.push({
+            name: "StyleBook",
+            randomIdCode: -1,
+            Id: -2,
+            configuration: createStyleBook(),
+            html: prepareStyleBookInjectionHTML()
+        });
         if (_includeJSResources) {
             componentsList.push({
                 name: "LayoutJavaScriptComponent",

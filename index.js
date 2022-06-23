@@ -26,7 +26,7 @@ function askMe()
             },{
                 type: 'rawlist',
                 name: 'includeJSResources',
-                message: 'Would you like JavaScript resources?',
+                message: 'Would you like import your JavaScript resources?',
                 choices: ['Yes', 'No'],
             }
         ])
