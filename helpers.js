@@ -120,16 +120,41 @@ function getClayIcons()
     return icons.sort((a, b) => (a.value > b.value) ? 1 :  -1 );
 }
 
-
+function removeDocumentWriteJS(source)
+{
+    var pattren = /document.write\([^\n]+\)/;
+    return  source.replace(pattren,'');
+}
+function fromDir(startPath, filter) {
+    if (!fs.existsSync(startPath)) {
+        console.log("no dir ", startPath);
+        return;
+    }
+    var files = fs.readdirSync(startPath);
+    var htmls = [];
+    for (var i = 0; i < files.length; i++) {
+        var filename = path.join(startPath, files[i]);
+        var stat = fs.lstatSync(filename);
+        if (stat.isDirectory())
+        {
+            fromDir(filename, filter);
+        } else if(filename.endsWith(filter)) {
+            htmls.push(filename);
+        }
+    }
+    return htmls;
+}
 
 module.exports = {
     getDate,
     saveFile,
     readFileContent,
     buildPathTree,
+    fromDir,
     getFileName,
     relativePathToFullPath,
     getFileExtension,
     getClayIcons,
+    removeDocumentWriteJS,
     isValidColorProp
 }

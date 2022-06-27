@@ -3,15 +3,16 @@
 const html2fragments = require('./jobs/html2fragments/main.js');
 const program = require('commander');
 const inquirer = require("inquirer");
-
+const namer = require("color-namer");
+const helpers = require('./helpers');
 function askMe()
 {
     inquirer
         .prompt([
             {
                 name: 'file',
-                message: 'Please specify the html file path "full path is required"?',
-                default: `${__dirname}/example/example-html/index.html`
+                message: 'Please specify the html folder path "full path is required"?',
+                default: `${__dirname}/example/hotel-example/index.html`
             },
             {
                 name: 'collectionName',
@@ -30,18 +31,23 @@ function askMe()
                 choices: ['Yes', 'No'],
             }
         ])
-        .then(answers => {
-            html2fragments.start(answers.collectionName,answers.file.toString(),answers.groupResources.toLowerCase()==="yes",answers.includeJSResources.toLowerCase()==="yes");
+        .then( answers => {
+
+            html2fragments.start(answers.collectionName,answers.file.toString(),
+                answers.groupResources.toLowerCase()==="yes",answers.includeJSResources.toLowerCase()==="yes",true);
+
         });
 }
 program
     .command('html2fragments')
     .alias('u')
     .description('Generate fragments collection out static html page')
-    .action(function (design, args) {
-        askMe()
-            });
+    .action(function (design, args) {askMe()});
 
 program.parse(process.argv);
+
+
+
+
 
 
