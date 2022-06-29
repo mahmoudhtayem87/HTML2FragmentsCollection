@@ -20,7 +20,12 @@ This command line has been created to ease the process of converting pure html p
 - **liferay-tag="logo"**: Add this tag to any element in your html template, this will be replaced with **Liferay Portal Logo and Home URL link**.
 - **liferay-tag="skip"**: Add this tag to any element in your html template to skip parsing the selected element.
 - **liferay-tag="dropzone"**: Add this tag to any element in your html template inside a component to turn that element into a dropzone area.
-
+- **liferay-tag="slider"**: Add this tag to any element in your html template inside a component to turn that element into a dynamic slider.
+- **liferay-tag="slide"**: Add this tag to any element in your html template inside a **slider** tagged element to give the parser an example of slider slide element.
+- **liferay-slide-tag="<property name>"**: Add this tag to any element in your html template inside **slide** tagged element to specify that you want this part to be mapped to a value which will be loaded from your selected **Liferay Collection**, this tag should go along with another tag to sepcify the type of the value you are mapping **liferay-slide-type="bg-image=<Type>".
+  - **bg-image**: This will map the value to style -> background image url
+  - **image**: This will map the value to image element with the value as the image source url.
+  - **text**: This will map the value to the element by setting the inner html.
 - Run the following command to generate the fragments' collection:  
     `liferay-design html2fragments`
 - The tool will ask you the following questions in order to start converting your html into a Liferay Fragments Collection

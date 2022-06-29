@@ -270,6 +270,8 @@ function fixElement(el, componentId) {
                 );
                 var attributes = el.querySelectorAll("[liferay-slide-tag]");
                 for (var index = 0; index < attributes.length; index++) {
+                    if ( attributes[index].getAttribute("liferay-slide-type")  === "friendlyUrl" )
+                        continue;
                     currentComponent.configuration.push({
                         "name": attributes[index].getAttribute("liferay-slide-tag"),
                         "label": attributes[index].getAttribute("liferay-slide-tag"),
@@ -293,6 +295,9 @@ function fixElement(el, componentId) {
                             attributes[index].setAttribute("src", "${getArticleValue(rootElement,configuration." +
                                 attributes[index].getAttribute("liferay-slide-tag") + ",'image')!''}")
                             break;
+                        case "friendlyUrl":
+                            el.setAttribute("href","${getDisplayURL (item)}");
+                            break;
                     }
                 }
                 var newHtml = `
@@ -310,6 +315,12 @@ function fixElement(el, componentId) {
                   Auto Generated Slider Area
                 </div>
                 [/#if]
+                [#function getDisplayURL entry]
+                [#assign  groupLocalService = serviceLocator.findService("com.liferay.portal.kernel.service.GroupLocalService")]
+                    [#assign group = groupLocalService.getGroup(entry.groupId?number)]
+                    [#assign url =themeDisplay.getPortalURL()  + '/w/' + entry.urlTitle ]
+                    [#return url]
+                [/#function]
                 [#function getArticleDocument groupId articleId]
                     [#assign srv = serviceLocator.findService("com.liferay.journal.service.JournalArticleLocalService")]
                     [#assign article = srv.getArticle(groupId,articleId)]
