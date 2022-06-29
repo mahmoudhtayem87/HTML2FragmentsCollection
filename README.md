@@ -26,6 +26,7 @@ This command line has been created to ease the process of converting pure html p
   - **bg-image**: This will map the value to style -> background image url
   - **image**: This will map the value to image element with the value as the image source url.
   - **text**: This will map the value to the element by setting the inner html.
+  - **friendlyUrl**: This type should be assigned to anchor elment, so the parser will map the web content friendly url to the anchor href.
 - Run the following command to generate the fragments' collection:  
     `liferay-design html2fragments`
 - The tool will ask you the following questions in order to start converting your html into a Liferay Fragments Collection
