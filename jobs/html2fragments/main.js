@@ -147,8 +147,17 @@ function GenerateLanguageADT() {
 
 function GenerateNavigationADT(el, componentId) {
     var singleItem = el.querySelectorAll("[liferay-tag='navigation-single-item']")[0];
-    singleItem.querySelectorAll("a")[0].innerHTML = "${navigationEntry.getName()}";
-    singleItem.querySelectorAll("a")[0].setAttribute("href", "${navigationEntry.getURL()}");
+    console.log(singleItem.tagName);
+    if (singleItem.tagName === "A")
+    {
+        singleItem.innerHTML = "${navigationEntry.getName()}";
+        singleItem.setAttribute("href", "${navigationEntry.getURL()}");
+    }else
+    {
+        singleItem.querySelectorAll("a")[0].innerHTML = "${navigationEntry.getName()}";
+        singleItem.querySelectorAll("a")[0].setAttribute("href", "${navigationEntry.getURL()}");
+    }
+
     singleItem.classList.add("{selected}");
 
     var navigationItemWithSub = el.querySelectorAll("[liferay-tag='navigation-item-with-sub']")[0];
