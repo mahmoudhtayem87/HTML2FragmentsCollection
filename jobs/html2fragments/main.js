@@ -270,7 +270,7 @@ function fixElement(el, componentId) {
                 );
                 var attributes = el.querySelectorAll("[liferay-slide-tag]");
                 for (var index = 0; index < attributes.length; index++) {
-                    if ( attributes[index].getAttribute("liferay-slide-type")  === "friendlyUrl" )
+                    if ( attributes[index].getAttribute("liferay-slide-type").toLowerCase()  === "friendlyurl" )
                         continue;
                     currentComponent.configuration.push({
                         "name": attributes[index].getAttribute("liferay-slide-tag"),
@@ -301,20 +301,7 @@ function fixElement(el, componentId) {
                     }
                 }
                 var newHtml = `
-                [#assign isEdit=false]
-                [#if themeDisplay.isSignedIn()]
-                [#assign req = request.getRequest()]
-                [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
-                [#if originalRequest.getParameter("p_l_mode")??]
-                [#assign isEdit=true]
-                [/#if]
-                [/#if]
-                
-                [#if isEdit]
-                <div class="alert alert-info p-4">
-                  Auto Generated Slider Area
-                </div>
-                [/#if]
+         
                 [#function getDisplayURL entry]
                 [#assign  groupLocalService = serviceLocator.findService("com.liferay.portal.kernel.service.GroupLocalService")]
                     [#assign group = groupLocalService.getGroup(entry.groupId?number)]
@@ -355,6 +342,22 @@ function fixElement(el, componentId) {
                 [/#list]
                 [/#if]
                 `;
+                el.parentNode.insertAdjacentHTML( 'afterbegin',`
+                       [#assign isEdit=false]
+                [#if themeDisplay.isSignedIn()]
+                [#assign req = request.getRequest()]
+                [#assign originalRequest = portalUtil.getOriginalServletRequest(req)]
+                [#if originalRequest.getParameter("p_l_mode")??]
+                [#assign isEdit=true]
+                [/#if]
+                [/#if]
+                
+                [#if isEdit]
+                <div class="alert alert-info p-4">
+                  Auto Generated Slider Area
+                </div>
+                [/#if]
+                `);
                 el.innerHTML = newHtml;
 
                 break;
