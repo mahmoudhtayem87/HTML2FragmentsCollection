@@ -1,6 +1,11 @@
-# HTML 2 Fragments Collection
-
-This command line has been created to ease the process of converting pure html pages into reusable Liferay fragments collections. The ultimate goal is to split the raw HTML into separate components and then convert those components into Liferay Fragments.
+# HTML 2 Fragments Collection 
+A command line to ease the process of converting pure html pages 
+into reusable Liferay fragments collections. 
+<br>
+The ultimate goal is to split the raw HTML 
+into separate components and then convert those components into 
+Liferay Fragments along with the styles "Theme" and the JavaScript Files, for the styles, it will scope it to the 
+Wrapper element to avoid any conflicts with Liferay default styles.
 
 # [](https://www.npmjs.com/package/html-2-fragments-collection#how-to-use)**How to Use**
 
