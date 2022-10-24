@@ -4,7 +4,7 @@ const {pathExistsSync} = require("fs-extra");
 const fse = require('fs-extra');
 const path = require('path');
 const parse = require('svg-parser');
-
+const resolve = require('path').resolve
 
 const colorProps = [
     "color",
@@ -70,13 +70,17 @@ function getFileName(fileFullPath)
     var pathObj = path.parse(fileFullPath);
     return pathObj.base;
 }
+function getFileDirectory(fileFullPath)
+{
+    var pathObj = path.parse(fileFullPath);
+    return pathObj.dir;
+}
 function getFileExtension(fileFullPath)
 {
     var pathObj = path.parse(fileFullPath);
     return pathObj.ext;
 }
 function relativePathToFullPath(filePath, relativePath) {
-
     var _dirTree = buildPathTree(filePath);
     var dirTree = JSON.parse(JSON.stringify(_dirTree));
     var path = `/${dirTree.join('/')}/${relativePath.replace('./', "")}`;
@@ -148,6 +152,7 @@ function fromDir(startPath, filter) {
 module.exports = {
     getDate,
     saveFile,
+    getFileDirectory,
     readFileContent,
     buildPathTree,
     fromDir,

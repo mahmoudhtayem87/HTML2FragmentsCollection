@@ -8,6 +8,9 @@ const csstree = require('css-tree');
 const {saveFile} = require("../../helpers");
 const namer = require('color-namer');
 const _ = require('lodash');
+const resolve = require('path').resolve
+
+
 const componentSelectorAtt = "liferay-component-type";
 const componentNameAtt = "liferay-component-name";
 var _componentId = 0;
@@ -311,7 +314,7 @@ function fixElement(el, componentId) {
                     }
                 }
                 var newHtml = `
-         
+
                 [#function getDisplayURL entry]
                 [#assign  groupLocalService = serviceLocator.findService("com.liferay.portal.kernel.service.GroupLocalService")]
                     [#assign group = groupLocalService.getGroup(entry.groupId?number)]
@@ -324,7 +327,7 @@ function fixElement(el, componentId) {
                     [#assign document = saxReaderUtil.read(article.getContent())]
                     [#return document.getRootElement()]
                 [/#function]
-            
+
                 [#function getArticleValue rootElement name type]
                     [#attempt]
                         [#list rootElement.elements() as dynamicElement ]
@@ -361,7 +364,7 @@ function fixElement(el, componentId) {
                 [#assign isEdit=true]
                 [/#if]
                 [/#if]
-                
+
                 [#if isEdit]
                 <div class="alert alert-info p-4">
                   Auto Generated Slider Area
@@ -487,7 +490,7 @@ function prepareStyleBookInjectionHTML() {
             [#assign isEdit=true]
             [/#if]
             [/#if]
-            
+
             [#if isEdit]
             <div class="alert alert-info p-4">
               Fragmented Theme Style Book - Header Area
@@ -512,7 +515,7 @@ function prepareResourcesInjectionHTML() {
             [#assign isEdit=true]
             [/#if]
             [/#if]
-            
+
             [#if isEdit]
             <div class="alert alert-info p-4">
               Resources "CSS" Loader Component - Header Resources Area
@@ -637,7 +640,8 @@ async function compressCollection() {
 }
 
 async function processCSSFile(_path) {
-    var path = helpers.relativePathToFullPath(htmlFile, _path);
+    var directory = helpers.getFileDirectory(htmlFile);
+    var path =resolve(directory, _path);
     if (helpers.getFileExtension(path) != ".css")
         return;
     if (fse.pathExistsSync(path)) {
@@ -686,7 +690,7 @@ function prepareJSResourcesInjectionHTML() {
             [#assign isEdit=true]
             [/#if]
             [/#if]
-            
+
             [#if isEdit]
             <div class="alert alert-info p-4">
               Java Script Loader Component - Footer Resources Area
@@ -766,7 +770,8 @@ function getFixedCSSFromString(content) {
 }
 
 async function processJSFile(_path) {
-    var path = helpers.relativePathToFullPath(htmlFile, _path);
+    var directory = helpers.getFileDirectory(htmlFile);
+    var path = resolve(directory,_path);
     if (helpers.getFileExtension(path) != ".js")
         return;
     if (fse.pathExistsSync(path)) {
@@ -826,7 +831,7 @@ async function createCustomCSSFile() {
         {
             display:inline-flex;
             margin:auto!important;
-            
+
         }
     .inline-flex
         {
