@@ -1,0 +1,66 @@
+
+    .w-100
+        {
+            width:100%!important;
+        }
+    .w-100 > div
+        {
+            width:100%!important;
+        }
+    .tbar
+        {
+            z-index : 999!important;
+        }
+    .clay-icon
+        {
+            display:inline-flex;
+            margin:auto!important;
+            
+        }
+    .inline-flex
+        {
+            display:inline-flex!important;
+        }
+    .inline-flex *
+        {
+            margin:auto!important;
+        }
+    .languageSelector .icon {
+        position: unset!important;
+        left: unset!important;
+        top: unset!important;
+        line-height: unset!important;
+        z-index: 3;
+        display: inline-flex!important;
+        }
+    .languageSelector .form-select {
+        height: unset!important;
+        left: unset!important;
+        top: unset!important;
+        line-height: unset!important;
+        z-index: 3;
+        display: inline-flex!important;
+        width:unset!important;
+        }
+    .languageSelector select
+        {
+        background: transparent;
+        border: none!important;
+        text-transform: uppercase;
+        max-width: 90px;
+        font-size: 13px;
+        color: #919191;
+        }
+    .languageSelector select:focus
+        {
+            outline:none!important;
+        }
+    .languageSelectorDropDown
+        {
+            text-transform: uppercase!important;
+        }
+    .container
+        {
+            margin:auto!important;
+        }
+    

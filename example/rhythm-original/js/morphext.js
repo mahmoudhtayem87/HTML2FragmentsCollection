@@ -1,0 +1,15 @@
+/*! Morphext - v2.4.7 - 2016-11-04 */!function(a){"use strict";function b(b,c){this.element=a(b),this.settings=a.extend({},d,c),this._defaults=d,this._init()}var c="Morphext",d={animation:"bounceIn",separator:",",speed:2e3,complete:a.noop};b.prototype={_init:function(){var b=this;this.phrases=[],this.element.addClass("morphext"),a.each(this.element.text().split(this.settings.separator),function(c,d){b.phrases.push(a.trim(d))}),this.index=-1,this.animate(),this.start()},animate:function(){this.index=++this.index%this.phrases.length,this.element[0].innerHTML='<span class="animated '+this.settings.animation+'">'+this.phrases[this.index]+"</span>",a.isFunction(this.settings.complete)&&this.settings.complete.call(this)},start:function(){var a=this;this._interval=setInterval(function(){a.animate()},this.settings.speed)},stop:function(){this._interval=clearInterval(this._interval)}},a.fn[c]=function(d){return this.each(function(){a.data(this,"plugin_"+c)||a.data(this,"plugin_"+c,new b(this,d))})}}(jQuery);
+(function($){
+    "use strict"; // Start of use strict
+    $(".text-rotate").each(function(){
+        var text_rotator = $(this);
+        var text_rotator_cont = text_rotator.html();
+        text_rotator.attr("aria-hidden", "true");
+        text_rotator.before("<span class='sr-only'>" + text_rotator_cont + "</span>");
+        text_rotator.Morphext({
+            animation: "fadeIn",
+            separator: ",",
+            speed: 4000
+        });
+    });
+})(jQuery);
