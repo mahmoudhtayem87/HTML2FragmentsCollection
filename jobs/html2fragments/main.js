@@ -283,7 +283,8 @@ function fixElement(el, componentId) {
                         continue;
                     currentComponent.configuration.push({
                         "name": attributes[index].getAttribute("liferay-slide-tag"),
-                        "label": attributes[index].getAttribute("liferay-slide-tag"),
+                        "label": attributes[index].getAttribute("liferay-slide-tag-label")?attributes[index].getAttribute("liferay-slide-tag-label"):
+                            attributes[index].getAttribute("liferay-slide-tag"),
                         "type": "text",
                         "typeOptions": {
                             "placeholder": "Placeholder"
@@ -793,7 +794,6 @@ async function SaveJSScripts() {
         }
     }
 }
-
 
 async function createCustomJSFile() {
     var script =

@@ -32,6 +32,8 @@ Wrapper element to avoid any conflicts with Liferay default styles.
   - **image**: This will map the value to image element with the value as the image source url.
   - **text**: This will map the value to the element by setting the inner html.
   - **friendlyUrl**: This type should be assigned to anchor elment, so the parser will map the web content friendly url to the anchor href.
+- **Note**
+  - In order to add Configuration Label for your slide mapping parameters, you will need to add the following tag **liferay-slide-tag-label="Configuration Label"**
 - Run the following command to generate the fragments' collection:  
   `liferay-design html2fragments`
 - The tool will ask you the following questions in order to start converting your html into a Liferay Fragments Collection
