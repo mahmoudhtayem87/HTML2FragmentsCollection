@@ -27,7 +27,7 @@ Wrapper element to avoid any conflicts with Liferay default styles.
 - **liferay-tag="dropzone"**: Add this tag to any element in your html template inside a component to turn that element into a dropzone area.
 - **liferay-tag="slider"**: Add this tag to any element in your html template inside a component to turn that element into a dynamic slider.
 - **liferay-tag="slide"**: Add this tag to any element in your html template inside a **slider** tagged element to give the parser an example of slider slide element.
-- **liferay-slide-tag="<property name>"**: Add this tag to any element in your html template inside **slide** tagged element to specify that you want this part to be mapped to a value which will be loaded from your selected **Liferay Collection**, this tag should go along with another tag to sepcify the type of the value you are mapping **liferay-slide-type="bg-image=<Type>".
+- **liferay-slide-tag="<property name>"**: Add this tag to any element in your html template inside, please make sure not to include any special character in the element name **slide** tagged element to specify that you want this part to be mapped to a value which will be loaded from your selected **Liferay Collection**, this tag should go along with another tag to sepcify the type of the value you are mapping **liferay-slide-type="<Type>".
   - **bg-image**: This will map the value to style -> background image url
   - **image**: This will map the value to image element with the value as the image source url.
   - **text**: This will map the value to the element by setting the inner html.
