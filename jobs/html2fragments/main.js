@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const compressing = require('compressing');
 var HTMLParser = require('node-html-parser');
 const helpers = require('../../helpers');
+const clientExt = require('./clientExt');
 const fs = require('fs');
 const fse = require('fs-extra');
 const csstree = require('css-tree');
@@ -974,6 +975,7 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources,
         await processFragmentsFolders();
         if (compress)
             await compressCollection();
+        await clientExt.start(projectRootFolder,collectionFolderPath);
     });
 }
 

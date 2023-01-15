@@ -1,6 +1,6 @@
 {
   "name": "html-2-fragments-collection",
-  "version": "3.0.9",
+  "version": "4.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "color-namer": "^1.4.0",
     "commander": "^9.3.0",
     "compressing": "^1.5.1",
+    "concat": "^1.0.3",
     "css-tree": "^2.1.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
