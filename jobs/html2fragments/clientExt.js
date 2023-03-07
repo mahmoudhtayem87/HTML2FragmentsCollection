@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
-const concat = require('concat');
 const path = require('path');
-
+const helpers = require('../../helpers');
 function fromDir(startPath, filter) {
 
     var Files = [];
@@ -22,24 +21,20 @@ function fromDir(startPath, filter) {
     };
     return Files;
 };
-async function build(projectFolder, collectionFolder) {
+async function build(projectFolder, jsClientExt, cssClientExt) {
 
     console.log("Generating Client Extensions...");
     await fs.ensureDir(`${projectFolder}/client-extensions`);
-
-    await concat(fromDir(`${collectionFolder}/resources`,'.js'),
-        `${projectFolder}/client-extensions/scripts.js`);
-
-    await concat(fromDir(`${collectionFolder}/resources`,'.css'),
-        `${projectFolder}/client-extensions/styles.css`);
-
+    await helpers.saveFile(`${projectFolder}/client-extensions/scripts.js`,
+        jsClientExt);
+    await helpers.saveFile(`${projectFolder}/client-extensions/styles.css`,
+        cssClientExt);
     console.log("Client Extensions Generated Successfully!");
 
 }
 
-async function start(projectFolder,collectionFolder)
-{
-    build(projectFolder,collectionFolder)
+async function start(projectFolder, jsClientExt, cssClientExt) {
+    build(projectFolder, jsClientExt, cssClientExt)
 }
 
 module.exports = {

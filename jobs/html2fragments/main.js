@@ -6,7 +6,7 @@ const clientExt = require('./clientExt');
 const fs = require('fs');
 const fse = require('fs-extra');
 const csstree = require('css-tree');
-const {saveFile} = require("../../helpers");
+const { saveFile } = require("../../helpers");
 const namer = require('color-namer');
 const _ = require('lodash');
 const resolve = require('path').resolve
@@ -31,14 +31,17 @@ var colorsArray = [];
 var cssfiles = [];
 const icons = helpers.getClayIcons();
 
+var jsClientExt = "";
+var cssClientExt = "";
+
 function tryGetColorName(code) {
     try {
-        return namer(`#${code}`, {pick: ['x11'], distance: 'deltaE'});
+        return namer(`#${code}`, { pick: ['x11'], distance: 'deltaE' });
 
     } catch (e) {
         console.log("could not find a name for color code: " + code);
         var color = {
-            x11: [{distance: 0, name: "color" + code.replaceAll("/", "").replaceAll("\\", ""), hex: `#{code}`}]
+            x11: [{ distance: 0, name: "color" + code.replaceAll("/", "").replaceAll("\\", ""), hex: `#{code}` }]
         }
         return color;
     }
@@ -52,7 +55,7 @@ function createStyleBook() {
     colorsArr = [];
     for (const key in grouped) {
         if (grouped.hasOwnProperty(key)) {
-            colorsArr.push({color: key, items: grouped[key]});
+            colorsArr.push({ color: key, items: grouped[key] });
         }
     }
     colorsArr = colorsArr.sort((a, b) => (a.items.length < b.items.length) ? 1 : ((b.items.length < a.items.length) ? -1 : 0));
@@ -152,12 +155,10 @@ function GenerateLanguageADT() {
 function GenerateNavigationADT(el, componentId) {
     var singleItem = el.querySelectorAll("[liferay-tag='navigation-single-item']")[0];
     console.log(singleItem.tagName);
-    if (singleItem.tagName === "A")
-    {
+    if (singleItem.tagName === "A") {
         singleItem.innerHTML = "${navigationEntry.getName()}";
         singleItem.setAttribute("href", "${navigationEntry.getURL()}");
-    }else
-    {
+    } else {
         singleItem.querySelectorAll("a")[0].innerHTML = "${navigationEntry.getName()}";
         singleItem.querySelectorAll("a")[0].setAttribute("href", "${navigationEntry.getURL()}");
     }
@@ -283,11 +284,11 @@ function fixElement(el, componentId) {
                 );
                 var attributes = el.querySelectorAll("[liferay-slide-tag]");
                 for (var index = 0; index < attributes.length; index++) {
-                    if ( attributes[index].getAttribute("liferay-slide-type").toLowerCase()  === "friendlyurl" )
+                    if (attributes[index].getAttribute("liferay-slide-type").toLowerCase() === "friendlyurl")
                         continue;
                     currentComponent.configuration.push({
                         "name": attributes[index].getAttribute("liferay-slide-tag"),
-                        "label": attributes[index].getAttribute("liferay-slide-tag-label")?attributes[index].getAttribute("liferay-slide-tag-label"):
+                        "label": attributes[index].getAttribute("liferay-slide-tag-label") ? attributes[index].getAttribute("liferay-slide-tag-label") :
                             attributes[index].getAttribute("liferay-slide-tag"),
                         "type": "text",
                         "typeOptions": {
@@ -310,7 +311,7 @@ function fixElement(el, componentId) {
                                 attributes[index].getAttribute("liferay-slide-tag") + ",'image')!''}")
                             break;
                         case "friendlyUrl":
-                            el.setAttribute("href","${getDisplayURL (item)}");
+                            el.setAttribute("href", "${getDisplayURL (item)}");
                             break;
                     }
                 }
@@ -356,7 +357,7 @@ function fixElement(el, componentId) {
                 [/#list]
                 [/#if]
                 `;
-                el.parentNode.insertAdjacentHTML( 'afterbegin',`
+                el.parentNode.insertAdjacentHTML('afterbegin', `
                        [#assign isEdit=false]
                 [#if themeDisplay.isSignedIn()]
                 [#assign req = request.getRequest()]
@@ -439,7 +440,7 @@ function fixElement(el, componentId) {
 }
 
 function processFragment(htmlElement, componentName) {
-    componentsList.push({name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: ""});
+    componentsList.push({ name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: "" });
     elementParser(htmlElement, _componentId);
     var currentComponent = componentsList.filter(com => com.Id === _componentId)[0];
     currentComponent.html = helpers.removeDocumentWriteJS(htmlElement.toString());
@@ -448,7 +449,7 @@ function processFragment(htmlElement, componentName) {
 
 function processContainerFragment(htmlElement, componentName) {
 
-    componentsList.push({name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: ""});
+    componentsList.push({ name: componentName, randomIdCode: 0, Id: _componentId, configuration: [], html: "" });
     containerParser(htmlElement, _componentId);
     var currentComponent = componentsList.filter(com => com.Id === _componentId)[0];
     currentComponent.html = helpers.removeDocumentWriteJS(htmlElement.toString());
@@ -631,7 +632,7 @@ async function createLiferayNPMBundlerConfigJS() {
 }
 
 async function createLiferayDeployFragmentsJSON() {
-    var obj = {"companyWebId": "liferay.com", "groupKey": "Guest"};
+    var obj = { "companyWebId": "liferay.com", "groupKey": "Guest" };
     await helpers.saveFile(`${projectFolder}/liferay-deploy-fragments.json`, JSON.stringify(obj));
 }
 
@@ -642,11 +643,12 @@ async function compressCollection() {
 
 async function processCSSFile(_path) {
     var directory = helpers.getFileDirectory(htmlFile);
-    var path =resolve(directory, _path);
+    var path = resolve(directory, _path);
     if (helpers.getFileExtension(path) != ".css")
         return;
     if (fse.pathExistsSync(path)) {
         var fixedCSS = getFixedCSS(path);
+        cssClientExt += " " + fixedCSS;
         var cssFileName = helpers.getFileName(path);
         resources_css_list.push(cssFileName);
         cssfiles.push({
@@ -660,6 +662,7 @@ async function processCSSFile(_path) {
 
 async function processCSSInlineStyle(Content, styleTagIndex) {
     var fixedCSS = getFixedCSSFromString(Content);
+    cssClientExt += " " + fixedCSS;
     var cssFileName = `inline_style_${styleTagIndex}.css`;
     resources_css_list.push(cssFileName);
     cssfiles.push({
@@ -726,7 +729,7 @@ function getFixedCSS(filePath) {
                 }
             }
             if (node.type === 'Selector') {
-                node.children.unshift({"type": "IdSelector", "loc": null, "name": "wrapper "});
+                node.children.unshift({ "type": "IdSelector", "loc": null, "name": "wrapper " });
             } else if (node.type === 'Url') {
                 processCSSFile(node.value);
             }
@@ -761,7 +764,7 @@ function getFixedCSSFromString(content) {
                 }
             }
             if (node.type === 'Selector') {
-                node.children.unshift({"type": "IdSelector", "loc": null, "name": "wrapper "});
+                node.children.unshift({ "type": "IdSelector", "loc": null, "name": "wrapper " });
             } else if (node.type === 'Url') {
                 processCSSFile(node.value);
             }
@@ -772,7 +775,7 @@ function getFixedCSSFromString(content) {
 
 async function processJSFile(_path) {
     var directory = helpers.getFileDirectory(htmlFile);
-    var path = resolve(directory,_path);
+    var path = resolve(directory, _path);
     if (helpers.getFileExtension(path) != ".js")
         return;
     if (fse.pathExistsSync(path)) {
@@ -780,6 +783,7 @@ async function processJSFile(_path) {
         var jsFileName = helpers.getFileName(path);
         resources_js_list.push(jsFileName);
         await fse.ensureDir(`${collectionFolderPath}/resources`);
+        jsClientExt += " " + helpers.removeDocumentWriteJS(jsContent);
         await helpers.saveFile(`${collectionFolderPath}/resources/${jsFileName}`, helpers.removeDocumentWriteJS(jsContent));
     } else {
         console.log(`Could not load the JS file: ${path}`);
@@ -794,6 +798,7 @@ async function SaveJSScripts() {
         } else {
             await fse.ensureDir(`${collectionFolderPath}/resources`);
             resources_js_list.push(`page_script_${index}.js`);
+            jsClientExt += " " + helpers.removeDocumentWriteJS(element.innerHTML.toString());
             await helpers.saveFile(`${collectionFolderPath}/resources/page_script_${index}.js`,
                 helpers.removeDocumentWriteJS(element.innerHTML.toString()));
             index += 1;
@@ -894,7 +899,7 @@ async function FixCSSAddVars() {
     colorsArr = [];
     for (const key in grouped) {
         if (grouped.hasOwnProperty(key)) {
-            colorsArr.push({color: key, items: grouped[key]});
+            colorsArr.push({ color: key, items: grouped[key] });
         }
     }
     colorsArr = colorsArr.sort((a, b) => (a.items.length < b.items.length) ? 1 : ((b.items.length < a.items.length) ? -1 : 0));
@@ -975,7 +980,7 @@ function start(_collectionName, htmlFilePath, _groupStyles, _includeJSResources,
         await processFragmentsFolders();
         if (compress)
             await compressCollection();
-        await clientExt.start(projectRootFolder,collectionFolderPath);
+        await clientExt.start(projectRootFolder, jsClientExt, cssClientExt);
     });
 }
 
