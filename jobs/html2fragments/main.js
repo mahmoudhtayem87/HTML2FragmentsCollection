@@ -175,7 +175,7 @@ function GenerateNavigationADT(el, componentId) {
              <#if SubEntry.isSelected()>
                 <#assign subActive=selectedClass>
              </#if>
-             ${singleItem.toString().replace("{selected}", "${subActive}")}
+             ${singleItem.toString().replace("{selected}", "${subActive}").replaceAll('navigationEntry','SubEntry')}
       </#list>
     `);
 
