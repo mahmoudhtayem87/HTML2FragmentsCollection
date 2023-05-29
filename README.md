@@ -1,56 +1,24 @@
-# HTML 2 Fragments Collection
-A command line to ease the process of converting pure html pages
-into reusable Liferay fragments collections.
-<br>
-The ultimate goal is to split the raw HTML
-into separate components and then convert those components into
-Liferay Fragments along with the styles "Theme" and the JavaScript Files, for the styles, it will scope it to the
-Wrapper element to avoid any conflicts with Liferay default styles.
+## **HTML 2 Fragments Collection**
 
-# [](https://www.npmjs.com/package/html-2-fragments-collection#how-to-use)**How to Use**
+HTML2Fragments Collection is a command-line tool designed to simplify the conversion of pure HTML pages into reusable Liferay Fragments collections. The primary objective is to divide the raw HTML into individual components, which can then be transformed into Liferay Fragments. This process also includes incorporating the associated styles, referred to as "Themes," and including the necessary JavaScript files. To ensure compatibility and prevent conflicts with Liferay's default styles, the styles are scoped specifically to the Wrapper element.
 
-- Install in the command-line using the following command:
-  `npm i html-2-fragments-collection -g`
-- Edit your HTML file and for each html element that you would like to convert to a Liferay Fragment add the following attributes:
-- **liferay-component-type** : Set the value of this attribute to "component" or "container"
-- **liferay-component-name** : Set the value of this attribute to the preferred collection title
-- **liferay-tag="navigation"**: Add this attribute to the html element which will be considered as your site navigation menu and it will be replaced with a freemarker script to load the site navigation menu.
-- **liferay-tag="navigation-root"**: Add this attribute to your html element which will be considered as your navigation menu template root.
-- **liferay-tag="navigation-item-with-sub"**: Add this attribute to your html element which will be considered as your 2 level navigation item template.
-- **liferay-tag="navigation-sub-label"**: Add this attribute to your html element which will be considered as your 2 level navigation item label.
-- **liferay-tag="navigation-single-item"**: Add this attribute to your html element which will be considered as your navigation item template.
-- **liferay-tag="avatar"**: Add this attribute to any div in your html template, this will be replaced with **personal bar** at the time the parser will run.
-- **liferay-tag="search"**: Add this tag to any div in your html template, this will be replaced with **search bar** at the time the parser will run.
-- **liferay-tag="language"**: Add this tag to any div in your html template, this will be replaced with **language bar** at the time the parser will run.
-- **liferay-tag="logo"**: Add this tag to any element in your html template, this will be replaced with **Liferay Portal Logo and Home URL link**.
-- **liferay-tag="skip"**: Add this tag to any element in your html template to skip parsing the selected element.
-- **liferay-tag="dropzone"**: Add this tag to any element in your html template inside a component to turn that element into a dropzone area.
-- **liferay-tag="slider"**: Add this tag to any element in your html template inside a component to turn that element into a dynamic slider.
-- **liferay-tag="slide"**: Add this tag to any element in your html template inside a **slider** tagged element to give the parser an example of slider slide element.
-- **liferay-slide-tag="<property name>"**: Add this tag to any element in your html template inside **slide** tagged element to specify that you want this part to be mapped to a value which will be loaded from your selected **Liferay Collection**, the value of **liferay-slide-tag should not include any special characters**, this tag should go along with another tag to sepcify the type of the value you are mapping **liferay-slide-type="<Type>".
-  - **bg-image**: This will map the value to style -> background image url
-  - **image**: This will map the value to image element with the value as the image source url.
-  - **text**: This will map the value to the element by setting the inner html.
-  - **friendlyUrl**: This type should be assigned to anchor elment, so the parser will map the web content friendly url to the anchor href.
-- **Note**
-  - In order to add Configuration Label for your slide mapping parameters, you will need to add the following tag **liferay-slide-tag-label="Configuration Label"**
-- Run the following command to generate the fragments' collection:  
-  `liferay-design html2fragments`
-- The tool will ask you the following questions in order to start converting your html into a Liferay Fragments Collection
-  -   **Please specify the html file path "full path is required"?**
-  -   **Please specify the fragment collection name?**
-  -   **Would you like to group all styles referencing in a single fragment?**
-  -   **Yes**: This mean that your style links will be grouped in one fragment that can be added either on the master page or the page where you would like to use your components.
-  -   **No**: This mean that your styles links will be added to each fragment will be created from this tool
-  -   **Would you like JavaScript resources?**
-  -   **Yes**: The tool will parse the JavaScript imports and group them in one fragment which can be used where you would like to include your JavaScript.
-  -   **No**: The tool will ignore JavaScript imports / inline scripting.
+## **How to Use**
 
-## **Important Note**
+*   To install the command-line tool, use the following command:   
+    `npm i html-2-fragments-collection -g.`
+*   Edit your HTML file and add the following attributes to each HTML element that you want to convert into a Liferay Fragment:
 
-This command line tool has been developed to give a starting point for you in the design migration process and to ease the process of converting static HTML components into reusable Liferay Fragments. During this process the tool will be scoping your styles so that they only apply to the appropriate section of Liferay. This might change some of your styles.
+<table><tbody><tr><td colspan="2"><strong>Fragments Related Tags</strong></td></tr><tr><td>liferay-component-type</td><td>Assign a value of either "component" or "container" to this attribute.</td></tr><tr><td>liferay-component-name</td><td>Assign the desired fragment title as the value of this attribute.</td></tr><tr><td colspan="2"><strong>Navigation Related Tags</strong></td></tr><tr><td>liferay-tag="navigation"</td><td><p>Include this attribute in the HTML element that represents your site navigation menu, and it will be replaced&nbsp;</p><p>with a Freemarker script to load the site navigation menu.</p></td></tr><tr><td>liferay-tag="navigation-root"</td><td>Apply this attribute to the HTML element that serves as the root of your navigation menu template.</td></tr><tr><td>liferay-tag="navigation-item-with-sub"</td><td>Add this attribute to the HTML element that will be designated as your two-level navigation item template.</td></tr><tr><td>liferay-tag="navigation-sub-label"</td><td>Apply this attribute to the HTML element that will serve as the label for your two-level navigation item.</td></tr><tr><td>liferay-tag="navigation-single-item"</td><td>Add this attribute to the HTML element that will serve as your navigation item template.</td></tr><tr><td colspan="2"><strong>Liferay TagLibs/Macros Related Tags</strong></td></tr><tr><td>liferay-tag="avatar"</td><td><p>Add this attribute to any <code><strong>&lt;div&gt;</strong></code> element in your HTML template, and it will be replaced with a&nbsp;</p><p>personal bar when the parser runs.</p></td></tr><tr><td>liferay-tag="search"</td><td><p>Include this tag within any <code><strong>&lt;div&gt;</strong></code> element in your HTML template, and it will be replaced with a search bar&nbsp;</p><p>when the parser executes.</p></td></tr><tr><td>liferay-tag="language"</td><td><p>Add this tag to any <code><strong>&lt;div&gt;</strong></code> element in your HTML template, and it will be replaced with a&nbsp;</p><p>language bar when the parser executes.</p></td></tr><tr><td>liferay-tag="logo"</td><td><p>Include this tag within any element in your HTML template, and it will be replaced with the&nbsp;</p><p><strong>Liferay Portal Logo</strong> and a <strong>Home URL</strong> link.</p></td></tr><tr><td>liferay-tag="dropzone"</td><td><p>Add this tag to any element within a component in your HTML template to transform that element&nbsp;</p><p>into a <strong>Dropzone Area</strong>.</p></td></tr><tr><td colspan="2"><strong>Slider Related Tags</strong></td></tr><tr><td>liferay-tag="slider"</td><td><p>Add this tag to any element within a component in your HTML template to convert that&nbsp;</p><p>element into a dynamic slider.</p></td></tr><tr><td>liferay-tag="slide"</td><td><p>Include this tag within any element in your HTML template, specifically inside a <strong>slider</strong> tagged element,&nbsp;</p><p>to provide the parser with an example of a slider slide element.</p></td></tr><tr><td>liferay-slide-tag=""</td><td><p>To specify that you want a particular element inside a <strong>slide</strong> tagged element in your HTML&nbsp;</p><p>template to be mapped to a value loaded from your selected Liferay Collection, use the following tag:</p><p><code>&lt;liferay-slide-map liferay-slide-tag="yourTag" liferay-slide-type="yourType"&gt;</code></p><p><code>&lt;/liferay-slide-map&gt;</code></p><p>&nbsp;</p><p>Make sure that the value of <strong>liferay-slide-tag</strong> does not contain any special characters. Additionally, this tag should be used in conjunction with another tag to specify the type of value you are mapping. Here are the available types and their corresponding attributes:</p><ol><li><code>liferay-slide-type = "bg-image"</code>: For mapping the value to the style as a background image URL</li><li><code>liferay-slide-type = "image"</code>: For mapping the value to the style as a background image URL</li><li><code>liferay-slide-type = "text"</code>: For mapping the value to the element by setting its inner HTML</li><li><code>liferay-slide-type = "friendlyUrl"</code>: For mapping the web content friendly URL to an anchor element's href attribute</li></ol><p><code></code></p></td></tr><tr><td colspan="2"><strong>Utility Tags</strong></td></tr><tr><td>liferay-tag="skip"</td><td><p>Include this tag within any element in your HTML template to indicate that the selected element&nbsp;</p><p>should be skipped during parsing “<strong>Convert As Is</strong>”.</p></td></tr></tbody></table>
 
-Modifying your styles after they have been parsed might be required to do style tuning and fixing. For this the tool will generate a **Liferay Fragment Collection Project** where you will find all of your resources under the resources folder. Once the modification is done, you can easily trigger the following command to package the Fragment collection and prepare it for being deployed in Liferay.
+## Important Note:
 
-`npm i`  
-`npm run compress`
+The command-line tool has been developed to provide a starting point for the design migration process and simplify the conversion of static HTML components into reusable Liferay Fragments. As part of this process, the tool will scope your styles to ensure they are applied correctly within Liferay. However, this may result in some changes to your styles.
+
+It is possible that you may need to modify the styles after they have been parsed to fine-tune and fix any issues. The tool will generate a Liferay Fragment Collection Project where you can find all your resources located in the resources folder. Once you have made the necessary modifications, you can easily execute the following commands to package the Fragment collection and prepare it for deployment in Liferay:
+
+```plaintext
+npm i 
+npm run compress
+```
+
+By running these commands, you will install any required dependencies and compress the Fragment collection, making it ready for deployment.
