@@ -126,8 +126,13 @@ function getClayIcons()
 
 function removeDocumentWriteJS(source)
 {
-    var pattren = /document.write\([^\n]+\)/;
-    return  source.replace(pattren,'');
+    try{
+        var pattren = /document.write\([^\n]+\)/;
+        return  source.replace(pattren,'');
+    }catch (exp){
+
+    }
+    return source;
 }
 function fromDir(startPath, filter) {
     if (!fs.existsSync(startPath)) {
