@@ -290,7 +290,10 @@ function fixElement(el, componentId) {
                     }
                 );
                 var attributes = el.querySelectorAll("[liferay-slide-tag]");
-
+                var slide = el.querySelectorAll('[liferay-tag="slide"]');
+                slide.forEach(element=>{
+                    element.setAttribute('class',element.getAttribute('class') + ' ${active}');
+                });
                 for (var index = 0; index < attributes.length; index++) {
                     if (attributes[index].getAttribute("liferay-slide-type").toLowerCase() === "friendlyurl")
                     {
@@ -321,9 +324,10 @@ function fixElement(el, componentId) {
                             attributes[index].setAttribute("src", "${getArticleValue(rootElement,configuration." +
                                 attributes[index].getAttribute("liferay-slide-tag") + ",'image')!''}")
                             break;
-                        /*case "friendlyUrl":
-                            el.setAttribute("href", "${getDisplayURL (item)}");
-                            break;*/
+                        case "video":
+                            attributes[index].setAttribute("src", "${getArticleValue(rootElement,configuration." +
+                                attributes[index].getAttribute("liferay-slide-tag") + ",'video')!''}")
+                            break;
                     }
                 }
                 var newHtml = `
@@ -351,6 +355,20 @@ function fixElement(el, componentId) {
                                     [#return imageObj.url]
                                 [/#if]
                             [/#if]
+                            [#if type == "video"]
+                        [#if dynamicElement.attributeValue("field-reference") == name]
+                            [#assign video = dynamicElement.element("dynamic-content").getStringValue()?replace("\\\\/","/")]
+                            [#assign videoObj = video?eval]
+                            [#assign str = videoObj.html ]
+                            [#assign srcPattern = r'src="(.*?)".*?']
+                            [#assign srcValue = '']
+                            [#assign matches = str?matches(srcPattern)!'dd']
+                            [#if matches?has_content]
+                              [#assign srcValue = matches[0]?substring(matches[0]?index_of('=')+1)?replace('"','')?replace('&videoEmbed=true','')]
+                            [/#if]
+                            [#return srcValue]
+                        [/#if]
+                    [/#if]
                             [#if type == "text"]
                             [#if dynamicElement.attributeValue("field-reference") == name]
                                 [#assign text = dynamicElement.element("dynamic-content").getText()]
@@ -363,6 +381,10 @@ function fixElement(el, componentId) {
                 [/#function]
                 [#if collectionObjectList??]
                 [#list collectionObjectList as item]
+                [#assign active='']
+                [#if item?index == 0]
+                    [#assign active='active']
+                [/#if]
                 [#assign rootElement = getArticleDocument(getterUtil.getLong(item.groupId),item.articleId?string)]
                     ${el.querySelectorAll("[liferay-tag='slide']").toString()}
                 [/#list]
