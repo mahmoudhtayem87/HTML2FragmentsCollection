@@ -17,8 +17,8 @@ The command-line tool has been developed to provide a starting point for the des
 It is possible that you may need to modify the styles after they have been parsed to fine-tune and fix any issues. The tool will generate a Liferay Fragment Collection Project where you can find all your resources located in the resources folder. Once you have made the necessary modifications, you can easily execute the following commands to package the Fragment collection and prepare it for deployment in Liferay:
 
 ```plaintext
-npm i 
-npm run compress
+npm i html-2-fragments-collection 
+liferay-design u
 ```
 
 By running these commands, you will install any required dependencies and compress the Fragment collection, making it ready for deployment.
