@@ -234,51 +234,7 @@ function fixElement(el, componentId) {
             case "navigation":
                 GenerateNavigationADT(el, componentId);
                 var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
-                el.innerHTML = `[#attempt]
-              [#assign navMenuID = configuration.navigationMenu?number]
-              [#assign templateId = configuration.navigationMenuTemplate?number]
-              [#assign ddmTemplateLocalService =
-              serviceLocator.findService("com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService")]
-              [#assign template = ddmTemplateLocalService.fetchDDMTemplate(templateId)]
-              [#assign siteNavigationMenuLocalService =
-              serviceLocator.findService("com.liferay.site.navigation.service.SiteNavigationMenuLocalService")]
-              [#assign navigationMenu = siteNavigationMenuLocalService.fetchSiteNavigationMenu(navMenuID)]
-              [@liferay_site_navigation["navigation-menu"]
-              ddmTemplateGroupId=template.groupId
-              ddmTemplateKey=template.templateKey
-              displayDepth=1
-              expandedLevels="auto"
-              rootItemType="absolute"
-              rootItemLevel=0
-              siteNavigationMenuId=navigationMenu.siteNavigationMenuId /]
-              [#recover]
-              <li class="nav-item">
-              <span class="nav-link">
-                            <small>Menu is temporarily unavailable, please make sure to enable service locator and set a valid navigation menu id and navigation menu template in the fragment configurations</small>
-                            </span>
-              </li>
-              [/#attempt]`;
-                //adding navigation menu configuration
-                currentComponent.configuration.push({
-                    "name": "navigationMenu",
-                    "label": "Navigation Menu ID",
-                    "type": "text",
-                    "typeOptions": {
-                        "placeholder": "Placeholder"
-                    },
-                    "dataType": "string",
-                    "defaultValue": ""
-                });
-                currentComponent.configuration.push({
-                    "name": "navigationMenuTemplate",
-                    "label": "Navigation Menu Template ID",
-                    "type": "text",
-                    "typeOptions": {
-                        "placeholder": "Placeholder"
-                    },
-                    "dataType": "string",
-                    "defaultValue": ""
-                });
+                el.innerHTML = `[@liferay.navigation_menu /]`;
                 break;
             case "slider":
                 var currentComponent = componentsList.filter(com => com.Id === componentId)[0];
