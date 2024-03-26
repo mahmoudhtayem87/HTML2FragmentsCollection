@@ -12,7 +12,7 @@ function askMe()
             {
                 name: 'file',
                 message: 'Please specify the html folder path "full path is required"?',
-                default: `${__dirname}/example/hotel-example/index.html`
+                default: `${__dirname}/example/example/solartec-1.0.0/index.html`
             },
             {
                 name: 'collectionName',
