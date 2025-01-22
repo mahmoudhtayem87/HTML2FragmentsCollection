@@ -747,7 +747,7 @@ function getFixedCSS(filePath) {
             }
         }
     });
-    return csstree.generate(ast);
+    return (csstree.generate(ast)).replaceAll("#wrapper", "#wrapper *:not(.excluded-area *) >  ");
 }
 function getFixedCSSByContent(Content) {
     var content = Content;
